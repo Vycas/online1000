@@ -67,7 +67,7 @@ class Game(models.Model):
         self.trump = None
         cards_1, cards_2, cards_3, bank = dealCards()
 
-    def raiseBet(self, user, bet):
+    def raiseBet(self, player, bet):
         """
         Tries to raise the bet up to given value.
 
@@ -83,7 +83,7 @@ class Game(models.Model):
 
         if not self.bettings:
             raise GameError('Bettings are already finished.')
-        if self.turn != user:
+        if self.turn != player:
             raise GameError('It\'s not your turn to bet.')
         if bet < 100 or bet > 300:
             raise GameError('Bet must be between 100 and 300.')
@@ -93,25 +93,32 @@ class Game(models.Model):
             raise GameError('Your bet must be higher than current bet.')
         
         self.bet = bet
-        self.turn = session.getNextTurn(self.turn)
+        self.turn = session.getNextTurn(player)
 
         if bet == 300:
             self.bettings = False
 
-    def makePass(self, user):
+    def makePass(self, player):
         """
-        Passes the bettings in current game. The user can only pass once in a game.
+        Passes the bettings in current game. The player can only pass once in a game.
 
         Fails if:
             - Bets are already finished
-            - The turn is not for the given user
-            - User has already passed
+            - The turn is not for the given player
+            - Player has already passed
         """
         
         if not self.bettings:
             raise GameError('Bettings are already finished.')
-        if self.turn != user:
+        if self.turn != player:
             raise GameError('It\'s not your turn to pass.')
+
+class GamePlayer(models.Model):
+    game = models.ForeignKey(Game, null=False)
+    user = models.ForeignKey(User, null=False)
+    cards = models.CharField(max_length=28)
+    bank = models.CharField(max_length=12)
+    tricks = 
 
 class History(models.Model):
     id = models.AutoField()

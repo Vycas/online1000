@@ -1,46 +1,148 @@
-from random import shuffle
-
-spades = 'S'
-clubs = 'C'
-diamonds = 'D'
-hearts = 'H'
-
-king = 'K'
-queen = 'Q'
-jack = 'J'
-
-ace = 'A'
-
-def getDeck(downto=2):
+class Card:
     """
-    Generates a deck of card down to given card.
+    Represents a card.
+
+    Card can have kind and value. Card is encoded into string using
+    following notation: [Kind][Value]
+    
+    Kinds:
+        S - Spades
+        C - Clubs
+        D - Diamonds
+        H - Hearts
+
+    Values:
+        2..10
+        A - Ace
+        K - King
+        Q - Queen
+        J - Jack
+
+    Examples:
+        The queen of hearts -> HQ
+        The ace of clubs -> CA
+        Seven of spades -> S7
+
+    >>> c = Card('HQ')
+    >>> c.value()
+    'Q'
+    >>> c.kind()
+    'H'
+    >>> c.valueName()
+    'Queen'
+    >>> c.kindName()
+    'Hearts'
+    >>> c.fullName()
+    'The Queen of Hearts'
+    >>> d = Card('D8')
+    >>> d < c
+    True
+    >>> Card('H0')
+    Traceback (most recent call last):
+        ...
+    ValueError: Invalid value code given for the card.
+    >>> Card('W7')
+    Traceback (most recent call last):
+        ...
+    ValueError: Invalid kind code given for the card.
     """
 
-    base = [ace, king, queen, jack]
-    kinds = [spades, clubs, diamonds, hearts]
-    cards = base + range(downto, 11)
-    return [kind + str(card) for card in cards for kind in kinds]
+    def __init__(self, code):
+        if not code[0] in self.kinds.keys():
+            raise ValueError('Invalid kind code given for the card.')
+        if not code[1:] in self.values.keys():
+            raise ValueError('Invalid value code given for the card.')
+        self.code = code
 
-def dealCards():
+    def __str__(self):
+        return self.code
+
+    def __hash__(self):
+        return hash(self.code)
+
+    def __cmp__(self, other):
+        k1 = self.kind()
+        k2 = other.kind()
+        if self.kind_order.index(k1) < self.kind_order.index(k2):
+            return -1
+        elif self.kind_order.index(k1) > self.kind_order.index(k2):
+            return 1
+        else:
+            v1 = self.value()
+            v2 = other.value()
+            if self.value_order.index(v1) < self.value_order.index(v2):
+                return -1
+            elif self.value_order.index(v1) > self.value_order.index(v2):
+                return 1
+            else:
+                return 0
+
+    def kind(self):
+        return self.code[0]
+
+    def value(self):
+        return self.code[1:]
+
+    def kindName(self):
+        return self.kinds[self.kind()]
+
+    def valueName(self):
+        return self.values[self.value()]
+
+    def fullName(self):
+        return "The %s of %s" % (self.valueName(), self.kindName())
+
+    @classmethod
+    def generateDeck(cls):
+        return CardSet([cls(kind + value) for value in cls.values.keys() for kind in cls.kinds.keys()])
+
+    kinds = {'S': 'Spades', 'C': 'Clubs', 'D': 'Diamonds', 'H': 'Hearts'}
+    values = {'A': 'Ace', 'K': 'King', 'Q': 'Queen', 'J': 'Jack',
+              '10': 'Ten', '9': 'Nine', '8': 'Eight', '7': 'Seven', '6': 'Six',
+              '5': 'Five', '4': 'Four', '3': 'Three', '2': 'Two'}
+    
+    kind_order = ('S', 'C', 'D', 'H')
+    value_order = ('A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2')
+
+
+class ThousandCard(Card):
     """
-    Deal cards for 1000 game and returns tuple for 3 players + bank.
+    A limitation to traditional card, allowing value to be only
+    Ace, 10, King, Queen, Jack, and 9.
+    
+    Also implemented point counting.
     """
 
-    cards = getDeck(9)
-    shuffle(cards)
-    return (cards[0:7], cards[7:14], cards[14:21], cards[21:24])
+    def points(self):
+        return self.weight[self.value()]
 
-def encodeToString(cards):
-    """
-    Encodes list of cards to string.
-    """
+    weight = {'A': 11, '10': 10, 'K': 4, 'Q': 3, 'J': 2, '9': 0}
+    values = {'A': 'Ace', 'K': 'King', 'Q': 'Queen', 'J': 'Jack', '10': 'Ten', '9': 'Nine'}
+    value_order = ('A', '10', 'K', 'Q', 'J', '9')
 
-    return ' '.join(cards)
 
-def decodeFromString(cards):
+class CardSet(list):
     """
-    Decodes the string to the list of cards.
+    Represent a set of cards.
     """
 
-    return cards.split(' ')
+    def __init__(self, cards=''):
+        """
+        Initializes the set from a string containing card codes, seperated with spaces.
+        """
 
+        if type(cards) == str:
+            cards = cards.split(' ')    
+        set.__init__(self, cards)
+
+    def __str__(self):
+        """
+        Returns a string containing a list of card codes.
+        """
+
+        return ' '.join(self)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
