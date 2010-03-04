@@ -1,17 +1,32 @@
 from django.db import models
 from django.contrib.auth.models import User
-from cards import dealCards
+from cards import CardSet, ThousandCard
+from random import shuffle
 
 class GameError(Exception):
     pass
 
+
+class Player(models.Model):
+    user = models.ForeignKey(User, null=False)
+    cards = models.CharField(max_length=32)
+    bank = models.CharField(max_length=16)
+    tricks = models.CharField(max_length=128)
+    passed = models.BooleanField()
+
+    def __init__(self, user):
+        """
+        Initializes player who represent user in one of the sessions.
+        """
+
+        self.user = user
+
+
 class Session(models.Model):
-    id = models.AutoField()
-    player_1 = models.ForeignKey(User, null=False)
-    player_2 = models.ForeignKey(User, null=False)
-    player_3 = models.ForeignKey(User, null=False)
-    player_4 = models.ForeignKey(User, null=True)
-    dealer = models.ForeignKey(User, null=False)
+    player_1 = models.OneToOneField(Player, null=False)
+    player_2 = models.OneToOneField(Player, null=False)
+    player_3 = models.OneToOneField(Player, null=False)
+    dealer = models.OneToOneField(Player, null=False)
     started = models.DateField(auto_now_add=True)
     finished = models.DateField()
 
@@ -19,11 +34,27 @@ class Session(models.Model):
         """
         One user start the session as host.
         """
-
-        self.player_1 = user
-        self.dealer = user
         
-    def getNextTurn(self, current):
+        self.player_1 = Player(user)
+        self.dealer = self.player_1
+
+    def join(self, user):
+        """
+        Another user joins this session and becomes its player.
+        """
+
+        if player_2 is None: player_2 = Player(user)
+        elif player_3 is None: player_3 = Player(user)
+        else: raise GameError('This session is already full.')
+        
+    def isfull(self):
+        """
+        Checks if all three player joined.
+        """
+
+        return (player_2 is not None) and (player_3 is not None)
+
+    def getNextPlayer(self, current):
         """
         Returns who is the next after the current player.
         """
@@ -33,24 +64,17 @@ class Session(models.Model):
         elif current == self.player_2:
             return player_3
         elif current == self.player_3:
-            if self.player_4 is None:
-                return player_1
-            else:
-                return player_4
-        else:
-            return None
+            return player_1
+
 
 class Game(models.Model):
     id = models.AutoField()
-    session = models.ForeignKey(Session, null=False)
-    turn = models.ForeignKey(User, null=False)
+    session = models.OneToOneField(Session, null=False)
+    turn = models.ForeignKey(Player, null=False)
     bet = models.SmallIntegerField(null=False)
     bettings = models.BooleanField(null=False)
     blind = models.BooleanField(null=False)
-    cards_1 = models.CharField(max_length=28, null=False)
-    cards_2 = models.CharField(max_length=28, null=False)
-    cards_3 = models.CharField(max_length=28, null=False)
-    bank = models.CharField(max_length=12, null=False)
+    bank = models.CharField(max_length=16, null=False)
     trump = models.CharField(max_length=1, null=True)
 
     def __init__(self, session):
@@ -59,13 +83,27 @@ class Game(models.Model):
         The turn is given to player after dealer.
         """
 
+        if session.game is not None:
+            raise GameError('This session already has active game.')
+
+        if not session.isfull:
+            raise GameError('Session must be full to start a game.')
+
         self.session = session
-        self.turn = session.dealer = session.getNextTurn(session.dealer)
+        cards = shuffle(ThousandCard.generateDeck())
+        player = session.player_1
+        for i in range(3):
+            player.cards = cards[i*7:(i+1)*7]
+            player.passed = False
+            player.bank = None
+            player.tricks = None
+            player = session.getNextPlayer(player)
+        self.bank = cards[21:24]
+        self.turn = session.dealer = session.getNextPlayer(session.dealer)
         self.bet = 100
         self.bettings = True
         self.blind = False
         self.trump = None
-        cards_1, cards_2, cards_3, bank = dealCards()
 
     def raiseBet(self, player, bet):
         """
@@ -93,7 +131,7 @@ class Game(models.Model):
             raise GameError('Your bet must be higher than current bet.')
         
         self.bet = bet
-        self.turn = session.getNextTurn(player)
+        self.turn = session.getNextPlayer(player)
 
         if bet == 300:
             self.bettings = False
@@ -112,13 +150,73 @@ class Game(models.Model):
             raise GameError('Bettings are already finished.')
         if self.turn != player:
             raise GameError('It\'s not your turn to pass.')
+        if player.passed:
+            raise GameError('This player has already passed.')
 
-class GamePlayer(models.Model):
-    game = models.ForeignKey(Game, null=False)
-    user = models.ForeignKey(User, null=False)
-    cards = models.CharField(max_length=28)
-    bank = models.CharField(max_length=12)
-    tricks = 
+        player.passed = True
+
+    def collectBank(self, player):
+        """
+        Collect the bank.
+
+        Fails if:
+            - The turn is not for the given player
+            - All other players have passed
+        """
+
+        if self.turn != player:
+            raise GameError('It\'s not your turn.')
+        next = self.session.getNextPlayer(player)
+        nextnext = self.session.getNextPlayer(next)
+        if not (next.passed and nextnext.passed):
+            raise GameError('All other players have to pass first.')
+
+        player.card += self.bank
+        self.bank = None
+
+    def putPrivateBank(self, player, cards):
+        """
+        Puts away the private bank.
+
+        Fails if:
+            - The turn is not for the given player
+            - The main bank is not collected yet
+            - Given cards are not three
+            - Given cards don't belong to player
+        """
+
+        if self.turn != player:
+            raise GameError('It\'s not your turn.')
+        if not self.bank is None:
+            raise GameError('The bank is not yet collected.')
+        if len(cards) != 3:
+            raise GameError('You must discard 3 cards.')
+        player.bank = CardSet()
+        for c in cards:
+            if not c in player.cards:
+                raise GameError('Given card does not belong to you.')
+            player.bank.append(c)
+        for c in player.bank:
+            player.cards.remove(c)
+
+    def startGame(self, player):
+        """
+        Called after bank collection and final bet. Closes bettings and start the game.
+        
+        Fails if:
+            - The turn is not for the given player
+            - Bank is not collected
+            - Private bank is not put away yet
+        """
+
+        if self.turn != player:
+            raise GameError('It\'s not your turn.')
+        if not self.bank is None:
+            raise GameError('The bank is not yet collected.')
+        if player.bank is None:
+            raise GameError('Private bank is not put away.')
+
+        self.bettings = False
 
 class History(models.Model):
     id = models.AutoField()
