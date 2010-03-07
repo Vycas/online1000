@@ -35,7 +35,9 @@ Released   : 20080425
       </ul>
     </div>
     
-    {% include "registration/login_box.html" %}
+    {% if not user.is_authenticated %}
+      {% include "registration/login_box.html" %}
+    {% endif %}
     
     <div id="lcontent">
     </div>
@@ -43,7 +45,7 @@ Released   : 20080425
   
   <div id="rcol">
     <div id="rcontent">
-    {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
     </div>
   </div>
 </div>

@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from forms import UserSignUpForm
@@ -6,8 +7,9 @@ from django.template import RequestContext
 def welcome(request):
     return render_to_response('welcome.html')
 
+@login_required
 def sessions(request):
-    return render_to_response('sessions.html')
+    return render_to_response('sessions.html', context_instance=RequestContext(request))
     
 def signup(request, template_name='registration/signup.html', signup_form=UserSignUpForm):
     if request.method == "POST":
