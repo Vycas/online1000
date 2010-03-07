@@ -28,7 +28,24 @@ Released   : 20080425
 </div>
 
 <div id="main">
-  {% block body %}{% endblock %}
+  <div id="lcol">
+    <div id="menu">
+      <ul>
+        {% block menu %}{% endblock %}
+      </ul>
+    </div>
+    
+    {% include "registration/login_box.html" %}
+    
+    <div id="lcontent">
+    </div>
+  </div>
+  
+  <div id="rcol">
+    <div id="rcontent">
+    {% block content %}{% endblock %}
+    </div>
+  </div>
 </div>
 
 <div id="footer">

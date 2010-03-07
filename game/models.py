@@ -219,9 +219,7 @@ class Game(models.Model):
         self.bettings = False
 
 class History(models.Model):
-    id = models.AutoField()
-    game = models.ForeignKey(Game, null=False)
+    session = models.ForeignKey(session, null=False)
     player_1 = models.SmallIntegerField(null=False)
     player_2 = models.SmallIntegerField(null=False)
     player_3 = models.SmallIntegerField(null=False)
-    player_4 = models.SmallIntegerField(null=True)

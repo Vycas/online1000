@@ -22,7 +22,7 @@ a:hover
 {
 text-decoration: none;
 color: #fff;
-background: #D3E378 url('images/bbg1.gif') repeat-x;
+background: #D3E378 url('/images/bbg1.gif') repeat-x;
 }
 
 strong
@@ -36,7 +36,7 @@ color: #50514D;
 width: 100%;
 height: 104px;
 background-color: #4d4d4d;
-background: url('images/a1.gif') repeat-x;
+background: url('/images/a1.gif') repeat-x;
 color: #ffffff;
 }
 
@@ -109,7 +109,7 @@ height: 27px;
 margin-bottom: 1px;
 text-decoration: none;
 background: inherit;
-background-image: url('images/bbg0.gif');
+background-image: url('/images/bbg0.gif');
 padding-left: 17px;
 padding-top: 11px;
 color: #636363;
@@ -125,7 +125,7 @@ margin-top: 5px;
 margin-right: 15px;
 width: 7px;
 height: 7px;
-background: url('images/x1.gif') no-repeat; 
+background: url('/images/x1.gif') no-repeat; 
 }
 
 #menu a:hover span
@@ -136,20 +136,20 @@ margin-top: 5px;
 margin-right: 15px;
 width: 7px;
 height: 7px;
-background: url('images/x2.gif') no-repeat;
+background: url('/images/x2.gif') no-repeat;
 }
 
 #menu a:hover
 {
 background: inherit;
 color: #fff;
-background-image: url('images/bbg1.gif');
+background-image: url('/images/bbg1.gif');
 }
 
 #menu_end
 {
 height: 30px;
-background-image: url('images/a2.gif');
+background-image: url('/images/a2.gif');
 }
 
 h1
@@ -181,7 +181,7 @@ color: #50514D;
 font-size: 15px;
 text-transform: lowercase;
 height: 34px;
-background: url('images/a3.gif') repeat-x 0px 17px;
+background: url('/images/a3.gif') repeat-x 0px 17px;
 }
 
 h3 span
@@ -200,6 +200,15 @@ margin-top: 0px;
 position: relative;
 width: 185px;
 float: left;
+}
+
+#rcol
+{
+position: relative;
+margin-left: 190px;
+width: 485px;
+background-image: url('/images/a2.gif');
+background-repeat: repeat-x;
 }
 
 #lcontent
@@ -221,7 +230,7 @@ list-style: none;
 
 li
 {
-background: url('images/x1.gif') no-repeat 0px 5px;
+background: url('/images/x1.gif') no-repeat 0px 5px;
 padding-left: 15px;
 }
 
@@ -230,6 +239,55 @@ p
 margin-bottom: 25px;
 text-align: justify;
 line-height: 20px;
+}
+
+form table
+{
+margin-left: 30px;
+}
+
+form table .label
+{
+text-align: right;
+padding-right: 5px;
+}
+
+form table .submit
+{
+text-align: center;
+padding-top: 10px;
+}
+
+form .errorlist
+{
+color: #DA514D;
+margin-left: 5px;
+}
+
+input
+{
+color: #50514D;
+border: solid 1px #dadada;
+font-size: 13px;
+width: 150px;
+}
+
+input[type=submit]
+{
+width: auto;
+padding: 3px;
+padding-left: 10px;
+padding-right: 10px;
+font-weight: bold;
+text-transform: lowercase;
+background-image: url('/images/bbg0.gif');
+}
+
+input[type=submit]:hover
+{
+color: #fff;
+background-image: url('/images/bbg1.gif');
+cursor: pointer;
 }
 
 #lcol p
@@ -271,15 +329,6 @@ padding-top: 0px;
 background-position: 0px 5px;
 }
 
-#rcol
-{
-position: relative;
-margin-left: 190px;
-width: 485px;
-background-image: url('images/a2.gif');
-background-repeat: repeat-x;
-}
-
 #slogan2
 {
 font-size: 14px;
@@ -302,7 +351,7 @@ background: inherit;
 color: #6C7425;
 text-transform: lowercase;
 font-weight: normal;
-font-size: 18px;
+font-size: 16px;
 margin-bottom: 5px;
 }
 
@@ -317,7 +366,7 @@ margin: 0px;
 {
 border: solid 1px #fff;
 padding: 15px;
-background: #FFFFE9 url('images/a4.gif') repeat-x;
+background: #FFFFE9 url('/images/a4.gif') repeat-x;
 color: inherit;
 }
 
@@ -340,7 +389,7 @@ left: 0px;
 #footer
 {
 clear: both;
-background: url('images/a2.gif') repeat-x;
+background: url('/images/a2.gif') repeat-x;
 width: 680px;
 margin: 0px auto;
 margin-bottom: 25px;

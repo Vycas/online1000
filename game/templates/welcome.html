@@ -1,50 +1,14 @@
 {% extends "master.html" %}
-{% block body %}
-<div id="lcol">
-  <div id="menu">
-    <ul>
-      <li><a href="#">Login<span></span></a></li>
-      <li><a href="#">Register<span></span></a></li>
-      <li><a href="http://www.pagat.com/marriage/1000.html">Rules<span></span></a></li>
-      <li><a href="#">About Me<span></span></a></li>
-      <li><a href="#">Contact Me<span></span></a></li>
-    </ul>
-  </div>
-  <div id="menu_end"></div>
+{% block title%}Welcome{% endblock %}
+{% block menu %}{% include "menu_welcome.html" %}{% endblock %}
+{% block content %}
+<h1>1000<span>.online</span></h1>
+<span id="slogan2">web-based online card game</span>
 
-  <div id="lcontent">
-    <h3 class="first">Created.<span>with</span></h3>
-    <ul class="divided">
-      <li class="first"><a href="http://www.python.org">Python</a></li>
-      <li><a href="http://www.djangoproject.com">Django</a></li>
-    </ul>
-  
-    <h3>About.<span>developer</span></h3>
-    <p>Hi, I am bachelor student from <a href="http://www.vu.lt">Vilnius University</a> studying Software engineering. I am interested in variuos IT topics. Python is my favorite language, as far as I have seen. Also interested in football. My weakness - Civ4.</p>
-  </div>
+<h3>What.is.<span>1000?</span></h3>
+<p>This excellent three-player game is well known in several Eastern European countries, including Russia, Belorus, Ukraine, Kazakhstan, Poland and Lithuania. For more information please read the <a href="http://www.pagat.com/marriage/1000.html">rules</a>.</p>
 
-</div>
-
-<div id="rcol">
-  <div id="rcontent">
-  
-    <h1>1000<span>.online</span></h1>
-    <span id="slogan2">web-based online card game</span>
-
-    <div class="box">
-      <div class="box_inner"> 
-        <div class="captioned_image">
-          <img src="images/logo.png" alt="Playing cards" />
-        </div>
-        <h2>What is 1000?</h2>
-        <p>This excellent three-player game is well known in several Eastern European countries, including Russia, Belorus, Ukraine, Kazakhstan, Poland and Lithuania. For more information please read the <a href="http://www.pagat.com/marriage/1000.html">rules</a>.</p>
-      </div>
-    </div>
-
-    <h3>Project.<span>Explanation</span></h3>
-    <p>This project was started as part of Python course at my university. I needed the topic for the project so I have chosen this game because I know and like it very much. My friend and I play this game very often during breaks and lectures. We find it very addictive. So I realized that it would be great idea to be able to play it online. This way we could play anywhere! And finally I could deliver this game to masses of people.
-    </p>
-  </div>
-</div>
-
+<h3>About.<span>the.project</span></h3>
+<p>This project was started as part of Python course at my university. I needed the topic for the project so I have chosen this game because I know and like it very much. My friend and I play this game very often during breaks and lectures. We find it very addictive. So I realized that it would be great idea to be able to play it online. This way we could play anywhere! And finally I could deliver this game to masses of people.
+</p>
 {% endblock %}
