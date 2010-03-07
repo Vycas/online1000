@@ -1,0 +1,26 @@
+<div class="box">
+  <div class="box_inner">
+    <h2>Login</h2>
+    <form method="post" action="/login/">
+      <table style="margin:0px">
+          <tr>
+            <td class="label">Username:</td>
+            <td><input type="text" name="username" id="id_username" style="width: 90px"/><br/></td>
+          </tr>
+          <tr>
+            <td class="label">Password:</td>
+            <td><input type="password" name="password" id="id_password" style="width: 90px"/></td>
+          </tr>
+          <tr>
+            <td colspan="2" class="submit"><input type="submit" value="Login" /><a style="margin-left:10px" href="/password_reset">Reset password</a></td>
+          </tr>
+      </table>
+      <br />
+      <input type="hidden" name="this_is_the_login_form" value="1" />
+      <input type="hidden" name="next" value="{{ next }}" />
+      <script type="text/javascript">
+        document.getElementById('id_username').focus()
+      </script>
+    </form>
+  </div>  
+</div>
