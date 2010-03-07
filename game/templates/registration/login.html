@@ -1,0 +1,18 @@
+{% extends "master.html" %}
+{% block title %}Login{% endblock %}  
+{% block menu %}{% include "menu_home.html" %}{% endblock %}
+{% block content %}
+<h1 class="first">Log.<span>in</span></h1>
+<p>Enter your username and password to log into the system.</p>
+<form method="post" action="/login">
+    <table>
+      {% include "form.html" %}
+      <tr>
+        <td colspan="2" class="submit"><input type="submit" value="Login" /> <a href="/password/reset">Reset password</a></td>
+      </tr>
+    </table>
+</form>
+<script type="text/javascript">
+  document.getElementById('id_username').focus()
+</script>
+{% endblock %}

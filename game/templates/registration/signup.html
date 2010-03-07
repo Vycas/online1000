@@ -1,0 +1,15 @@
+{% extends "master.html" %}
+{% block title %}Sign up{% endblock %}
+{% block menu %}{% include "menu_home.html" %}{% endblock %}
+{% block content %}
+<h1 class="first">Sign.<span>up</span></h1>
+<p>Join the game in a minute by filling following fields.</p>
+<form method="post" action="/signup">
+  <table>
+    {% include "form.html" %}
+    <tr>
+      <td colspan="2" class="submit"><input type="submit" value="Signup" /></td>
+    </tr>
+  </table>
+</form>
+{% endblock %}
