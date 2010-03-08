@@ -18,12 +18,15 @@ urlpatterns = patterns('',
     (r'^sessions$', sessions),
     (r'^host/$', host),
     (r'^play/([0-9]+)$', play),
+    (r'^update/([0-9]+)$', update),
     
     # [Static serve]
     (r'^styles/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': 'game/styles'}),
     (r'^images/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': 'game/images'}),
+    (r'^js/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': 'game/js'}),
 
 
     # Example:

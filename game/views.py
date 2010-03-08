@@ -4,8 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from forms import UserSignUpForm
 from django.template import RequestContext
-from models import Session, Player, Game
+from models import Session, Player, Game, GameError
 from django.db.models import Q
+import simplejson as json
 
 def welcome(request):
     if request.user.is_authenticated():
@@ -54,20 +55,86 @@ def signup_done(request, template_name='registration/signup_done.html'):
 def host(request):
     session = Session()
     session.host(request.user)
-    session.save()
     site = Site.objects.get_current()
     return render_to_response('host.html', {'id': session.id, 'domain': site.domain}, context_instance=RequestContext(request))
 
 @login_required
 def play(request, id):
+    user = request.user
     try:
         session = Session.objects.get(id=id)
     except Session.DoesNotExist:
         return render_to_response('error.html', {'error': 'This session does not exist.'}, context_instance=RequestContext(request))
-    if session.playing(request.user):
-        pass
-    elif session.is_full():
-        return render_to_response('error.html', {'error': 'This session is already full.'}, context_instance=RequestContext(request))
-    else:
-        session.join(request.user)
-    return render_to_response('game.html', {'ingame': True})
+    
+    try:
+        player = session.getPlayerByUser(user)
+        if player is None:
+            player = session.join(user)
+    
+        return render_to_response('game.html', {'ingame':True})
+    except GameError, error:
+        return render_to_response('error.html', {'error': error}, context_instance=RequestContext(request))
+
+def getstate(request, id):
+    user = request.user
+    try:
+        session = Session.objects.get(id=id)
+    except Session.DoesNotExist:
+        return {'error': 'This session does not exist.'}
+    
+    response = {}
+    try:
+        player = session.getPlayerByUser(user)
+        if player is None:
+            player = session.join(user)
+    
+        if session.player_1 == player:
+            opponent1, opponent2 = session.player_2, session.player_3
+        elif session.player_2 == player:
+            opponent1, opponent2 = session.player_3, session.player_1
+        elif session.player_3 == player:
+            opponent1, opponent2 = session.player_1, session.player_2
+    
+        response['player_username'] = player.user.username
+        response['player_points'] = str(player.points) + ' points'
+        if opponent1:
+            response['opponent1_username'] = opponent1.user.username
+            response['opponent1_points'] = str(opponent1.points) + ' points'
+        else:
+            response['opponent1_username'] = '[Not connected]'
+            response['opponent1_points'] = ''
+        if opponent2:
+            response['opponent2_username'] = opponent2.user.username
+            response['opponent2_points'] = str(opponent2.points) + ' points'
+        else:
+            response['opponent2_username'] = '[Not connected]'
+            response['opponent2_points'] = ''
+        
+        response['player_turn'] = ''
+        response['opponent1_turn'] = ''
+        response['opponent2_turn'] = ''
+        
+        response['info_header'] = ''
+        
+        if session.is_full():
+            try:
+                turn = session.game.turn
+            except Game.DoesNotExist:
+                turn = session.dealer
+        
+            if turn == player: response['player_turn'] = 'Waiting for turn'
+            elif turn == opponent1: response['opponent1_turn'] = 'Waiting for turn'
+            elif turn == opponent2: response['opponent2_turn'] = 'Waiting for turn'
+            
+        else:
+            response['info_header'] = 'Waiting for players'
+        
+    except GameError, error:
+        return {'error': error}
+    return response
+    
+def update(request, id):
+    state = getstate(request, id)
+    print state
+    out = json.dumps(state, separators=(',',':'))
+    return HttpResponse(out, mimetype='application/json')

@@ -325,11 +325,21 @@ cursor: pointer;
 height: 350px;
 }
 
+.player_box
+{
+font-size: 14px;
+width: 130px;
+height: 100px;
+}
+
+.player_box h3
+{
+text-transform: none;
+}
+
 #left_opponent
 {
 position: absolute;
-width: 130px;
-height: 100px;
 top: 40px;
 left: 10px;
 }
@@ -337,13 +347,18 @@ left: 10px;
 #right_opponent
 {
 position: absolute;
-width: 130px;
-height: 100px;
 top: 40px;
 right: 10px;
 }
 
-#gameheader
+#your_player
+{
+position: absolute;
+top: 200px;
+left: 10px;
+}
+
+#game_header
 {
 position: absolute;
 text-align: center;
@@ -445,7 +460,7 @@ padding-top: 0px;
 background-position: 0px 5px;
 }
 
-#slogan2
+.slogan
 {
 font-size: 14px;
 position: relative;

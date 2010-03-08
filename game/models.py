@@ -9,10 +9,12 @@ class GameError(Exception):
 
 class Player(models.Model):
     user = models.ForeignKey(User, null=False)
+    points = models.SmallIntegerField(null=False, default=0)
     cards = models.CharField(max_length=32)
     bank = models.CharField(max_length=16)
     tricks = models.CharField(max_length=128)
     passed = models.BooleanField()
+    plus = models.BooleanField(default=False)
 
 
 class Session(models.Model):
@@ -32,29 +34,47 @@ class Session(models.Model):
         player.save()
         self.player_1 = player
         self.dealer = player
+        self.save()
+        return player
 
     def join(self, user):
         """
         Another user joins this session and becomes its player.
         """
 
-        if self.player_2 is None: self.player_2 = Player(user)
-        elif self.player_3 is None: self.player_3 = Player(user)
-        else: raise GameError('This session is already full.')
-        
-    def playing(self, user):
-        """
-        Checks if current user is playing in this session.
-        """
-        
-        return user in (self.player_1, self.player_2)
+        if self.player_2 is None:
+            player = Player(user=user)
+            player.save()
+            self.player_2 = player
+            self.save()
+            return player
+        elif self.player_3 is None:
+            player = Player(user=user)
+            player.save()
+            self.player_3 = player
+            self.save()
+            return player
+        else:
+            raise GameError('This session is already full.')
         
     def is_full(self):
         """
         Checks if all three player joined.
         """
 
-        return (self.player_2 is not None) and (self.player_3 is not None)
+        return (self.player_2 is not None) and \
+               (self.player_2 is not None) and \
+               (self.player_3 is not None)
+
+    def getPlayerByUser(self, user):
+        """
+        Return the player associated with given user in this session.
+        """
+        
+        if self.player_1 and self.player_1.user == user: return self.player_1
+        elif self.player_2 and self.player_2.user == user: return self.player_2
+        elif self.player_3 and self.player_3.user == user: return self.player_3
+        else: return None
 
     def getNextPlayer(self, current):
         """

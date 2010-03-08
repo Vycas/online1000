@@ -3,16 +3,20 @@
 {% block game %}
 <div id="spacer"/>
 
-<div id="left_opponent">
-  <h3 class="first">Opponent1</h3>
+<div id="left_opponent" class="player_box">
+      <h3 class="first" id="opponent1_username"></h3>
+      <span class="slogan" id="opponent1_points"></span><br/>
+      <span id="opponent1_turn"></span>
 </div>
 
-<div id="right_opponent">
-  <h3 class="first">Opponent2</h3>
+<div id="right_opponent" class="player_box">
+    <h3 class="first" id="opponent2_username"></h3>
+    <span class="slogan" id="opponent2_points"></span><br/>
+    <span id="opponent2_turn"></span>
 </div>
 
-<div id="gameheader">
-  <h1>Waiting for players</h2>
+<div id="game_header">
+  <h1 id="info_header"></h1>
 </div>
 
 <div id="bank">
@@ -21,20 +25,34 @@
   <img id="bank3" src="/images/cards/S2.gif">
 </div>
 
+<div id="your_player" class="player_box">
+  <h3 class="first" id="player_username"></h3>
+  <span class="slogan" id="player_points"></span><br/>
+  <span id="player_turn"></span>
+</div>
+
 <div id="cards">
-  <img class="card" src="/images/cards/S2.gif">
-  <img class="card" src="/images/cards/S2.gif">
-  <img class="card" src="/images/cards/S2.gif">
-  <img class="card" src="/images/cards/S2.gif">
-  <img class="card" src="/images/cards/S2.gif">
-  <img class="card" src="/images/cards/S2.gif">
-  <img class="card" src="/images/cards/S2.gif">
-  <img class="card" src="/images/cards/H2.gif">
-  <img class="card" src="/images/cards/H2.gif">
-  <img class="card" src="/images/cards/H2.gif">
+  <img class="card" id="card1" src="/images/cards/S2.gif">
+  <img class="card" id="card2" src="/images/cards/S2.gif">
+  <img class="card" id="card3" src="/images/cards/S2.gif">
+  <img class="card" id="card4" src="/images/cards/S2.gif">
+  <img class="card" id="card5" src="/images/cards/S2.gif">
+  <img class="card" id="card6" src="/images/cards/S2.gif">
+  <img class="card" id="card7" src="/images/cards/S2.gif">
+  <img class="card" id="card8" src="/images/cards/H2.gif">
+  <img class="card" id="card9" src="/images/cards/H2.gif">
+  <img class="card" id="card10" src="/images/cards/H2.gif">
 </div>
 
 <div id="gamemenu">
   <h3 class="first">Game menu</h3>
 </div>
+
+<script type="text/javascript" src="/js/ajax.js"/>
+<script type="text/javascript" src="/js/game.js"/>
+<script type="text/javascript">
+  var url = location.href;
+  id = url.substr(url.lastIndexOf('/')+1);
+  update(id);
+</script>
 {% endblock %}
