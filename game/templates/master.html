@@ -28,6 +28,9 @@ Released   : 20080425
 </div>
 
 <div id="main">
+  {% if ingame %}
+    {% block game %}{% endblock %}
+  {% else %}
   <div id="lcol">
     <div id="menu">
       <ul>
@@ -48,6 +51,7 @@ Released   : 20080425
       {% block content %}{% endblock %}
     </div>
   </div>
+  {% endif %}
 </div>
 
 <div id="footer">

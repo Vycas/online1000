@@ -320,6 +320,92 @@ background-image: url('/images/bbg1.gif');
 cursor: pointer;
 }
 
+#spacer
+{
+height: 350px;
+}
+
+#left_opponent
+{
+position: absolute;
+width: 130px;
+height: 100px;
+top: 40px;
+left: 10px;
+}
+
+#right_opponent
+{
+position: absolute;
+width: 130px;
+height: 100px;
+top: 40px;
+right: 10px;
+}
+
+#gameheader
+{
+position: absolute;
+text-align: center;
+top: 20px;
+left: 150px;
+right: 150px;
+}
+
+#gamemenu
+{
+position: absolute;
+top: 200px;
+right: 10px;
+width: 130px;
+}
+
+#bank
+{
+position: absolute;
+top: 70px;
+left: 255px;
+right: 255px;
+height: 150px;
+}
+
+#bank1
+{
+position: absolute;
+top: 0px;
+left: 0px;
+}
+
+#bank2
+{
+position: absolute;
+top: 0px;
+right: 0px;
+}
+
+#bank3
+{
+position: absolute;
+bottom: 0px;
+left: 50px;
+right: 50px;
+}
+
+#cards
+{
+position: absolute;
+top: 240px;
+left: 150px;
+right: 150px;
+text-align: center;
+padding-left: 40px;
+}
+
+.card
+{
+margin-left: -45px;
+}
+
 #lcol p
 {
 font-size: 10px;

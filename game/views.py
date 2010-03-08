@@ -65,9 +65,9 @@ def play(request, id):
     except Session.DoesNotExist:
         return render_to_response('error.html', {'error': 'This session does not exist.'}, context_instance=RequestContext(request))
     if session.playing(request.user):
-        pass #todo playing
+        pass
     elif session.is_full():
         return render_to_response('error.html', {'error': 'This session is already full.'}, context_instance=RequestContext(request))
     else:
         session.join(request.user)
-        #todo playing
+    return render_to_response('game.html', {'ingame': True})
