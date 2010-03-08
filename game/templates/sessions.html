@@ -3,7 +3,33 @@
 {% block menu %}{% include "menu_session.html" %}{% endblock %}
 {% block content %}
 <div>
+  <form method="post" action="/host/">
+    <input type="submit" value="Host new session" style="float:right"/>
+  </form>
   <h1 class="first">My.<span>sessions</span></h1>
-
+  <table>
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Hosted by</th>
+        <th>Started</th>
+        <th>Last move</th>
+        <th>Turn</th>
+        <th>State</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in sessions %}
+        <tr onclick="document.location.href='http://{{ domain }}/play/{{ s.id }}'" {% ifequal user.username s.turn %}class="strong"{% endifequal %}>
+          <td>{{ s.id }}</td>
+          <td>{{ s.hostedby }}</td>
+          <td>{{ s.started|date:"Y-m-d H:i" }}</td>
+          <td>{{ s.lastmove|date:"Y-m-d H:i" }}</td>
+          <td>{{ s.turn }}</td>
+          <td>{{ s.state }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

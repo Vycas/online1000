@@ -133,7 +133,7 @@ class CardSet(list):
 
         if type(cards) == str:
             cards = cards.split(' ')    
-        set.__init__(self, cards)
+        list.__init__(self, cards)
 
     def __str__(self):
         """

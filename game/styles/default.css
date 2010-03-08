@@ -241,6 +241,36 @@ text-align: justify;
 line-height: 20px;
 }
 
+table
+{
+width: 100%;
+border-spacing: 1px;
+margin-top: 10px;
+font-size: 12px;
+}
+
+table th
+{
+background-image: url('/images/bbg0.gif');
+color: #50514D;
+padding-top: 5px;
+padding-bottom: 5px;
+padding-right: 5px;
+text-align: left;
+text-transform: lowercase;
+}
+
+table tr.strong td
+{
+font-weight: bold;
+}
+
+table tr:hover
+{
+cursor: pointer;
+color: #50514D;
+}
+
 form table
 {
 margin-left: 30px;

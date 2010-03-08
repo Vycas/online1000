@@ -16,6 +16,8 @@ urlpatterns = patterns('',
     (r'^signup$', signup),
     (r'^signup_done$', signup_done),
     (r'^sessions$', sessions),
+    (r'^host/$', host),
+    (r'^play/([0-9]+)$', play),
     
     # [Static serve]
     (r'^styles/(?P<path>.*)$', 'django.views.static.serve',

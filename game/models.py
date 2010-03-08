@@ -14,45 +14,47 @@ class Player(models.Model):
     tricks = models.CharField(max_length=128)
     passed = models.BooleanField()
 
-    def __init__(self, user):
-        """
-        Initializes player who represent user in one of the sessions.
-        """
-
-        self.user = user
-
 
 class Session(models.Model):
-    player_1 = models.OneToOneField(Player, null=False)
-    player_2 = models.OneToOneField(Player, null=False)
-    player_3 = models.OneToOneField(Player, null=False)
-    dealer = models.OneToOneField(Player, null=False)
-    started = models.DateField(auto_now_add=True)
-    finished = models.DateField()
+    player_1 = models.OneToOneField(Player, null=False, related_name='session_as1')
+    player_2 = models.OneToOneField(Player, null=True, related_name='session_as2')
+    player_3 = models.OneToOneField(Player, null=True, related_name='session_as3')
+    dealer = models.OneToOneField(Player, null=False, related_name='session_as_dealer')
+    started = models.DateTimeField(auto_now_add=True, null=False)
+    finished = models.DateTimeField(null=True)
 
-    def __init__(self, user):
+    def host(self, user):
         """
         One user start the session as host.
         """
         
-        self.player_1 = Player(user)
-        self.dealer = self.player_1
+        player = Player(user=user)
+        player.save()
+        self.player_1 = player
+        self.dealer = player
 
     def join(self, user):
         """
         Another user joins this session and becomes its player.
         """
 
-        if player_2 is None: player_2 = Player(user)
-        elif player_3 is None: player_3 = Player(user)
+        if self.player_2 is None: self.player_2 = Player(user)
+        elif self.player_3 is None: self.player_3 = Player(user)
         else: raise GameError('This session is already full.')
         
-    def isfull(self):
+    def playing(self, user):
+        """
+        Checks if current user is playing in this session.
+        """
+        
+        return user in (self.player_1, self.player_2)
+        
+    def is_full(self):
         """
         Checks if all three player joined.
         """
 
-        return (player_2 is not None) and (player_3 is not None)
+        return (self.player_2 is not None) and (self.player_3 is not None)
 
     def getNextPlayer(self, current):
         """
@@ -68,7 +70,6 @@ class Session(models.Model):
 
 
 class Game(models.Model):
-    id = models.AutoField()
     session = models.OneToOneField(Session, null=False)
     turn = models.ForeignKey(Player, null=False)
     bet = models.SmallIntegerField(null=False)
@@ -77,7 +78,7 @@ class Game(models.Model):
     bank = models.CharField(max_length=16, null=False)
     trump = models.CharField(max_length=1, null=True)
 
-    def __init__(self, session):
+    def start(self, session):
         """
         New game is started in given session.
         The turn is given to player after dealer.
@@ -219,7 +220,7 @@ class Game(models.Model):
         self.bettings = False
 
 class History(models.Model):
-    session = models.ForeignKey(session, null=False)
+    session = models.ForeignKey(Session, null=False)
     player_1 = models.SmallIntegerField(null=False)
     player_2 = models.SmallIntegerField(null=False)
     player_3 = models.SmallIntegerField(null=False)
