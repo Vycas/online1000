@@ -294,7 +294,7 @@ color: #DA514D;
 margin-left: 5px;
 }
 
-input
+input, select
 {
 color: #50514D;
 border: solid 1px #dadada;
@@ -370,9 +370,15 @@ right: 150px;
 #gamemenu
 {
 position: absolute;
-top: 200px;
+top: 160px;
 right: 10px;
 width: 130px;
+}
+
+#gamemenu input, #gamemenu select
+{
+width: 120px;
+margin: 2px;
 }
 
 #bank
@@ -412,8 +418,15 @@ position: absolute;
 top: 240px;
 left: 150px;
 right: 150px;
-text-align: center;
+}
+
+#cards_inner
+{
 padding-left: 40px;
+text-align: center;
+width: auto;
+margin-left:auto;
+margin-right:auto;
 }
 
 .card

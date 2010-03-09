@@ -116,18 +116,25 @@ def getstate(request, id):
         
         response['info_header'] = ''
         
-        if session.is_full():
-            try:
+        if session.isFull():
+            if session.hasActiveGame():
                 turn = session.game.turn
-            except Game.DoesNotExist:
+                response['state'] = 'started'
+            else:
                 turn = session.dealer
-        
+                response['state'] = 'ready'
+            
             if turn == player: response['player_turn'] = 'Waiting for turn'
             elif turn == opponent1: response['opponent1_turn'] = 'Waiting for turn'
             elif turn == opponent2: response['opponent2_turn'] = 'Waiting for turn'
             
+            
         else:
             response['info_header'] = 'Waiting for players'
+            response['state'] = 'waiting'
+        #response['bettings'] = []
+        #for a in range(140, 301, 10):
+        #    response['bettings'].append(a)
         
     except GameError, error:
         return {'error': error}
@@ -138,3 +145,17 @@ def update(request, id):
     print state
     out = json.dumps(state, separators=(',',':'))
     return HttpResponse(out, mimetype='application/json')
+
+def start(request, id):
+    try:
+        session = Session.objects.get(id=id)
+    except Session.DoesNotExist:
+        return HttpResponse('This session does not exist.', mimetype='text/plain')
+    
+    try:
+        game = Game()
+        game.start(session)
+    except GameError, error:
+        return HttpResponse(error, mimetype='text/plain')
+    
+    

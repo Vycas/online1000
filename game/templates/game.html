@@ -1,17 +1,19 @@
 {% extends "master.html" %}
 {% block title %}Game{% endblock %}
 {% block game %}
-<div id="spacer"/>
+<div id="spacer"></div>
 
 <div id="left_opponent" class="player_box">
       <h3 class="first" id="opponent1_username"></h3>
       <span class="slogan" id="opponent1_points"></span><br/>
+      <span id="opponent1_info"></span>
       <span id="opponent1_turn"></span>
 </div>
 
 <div id="right_opponent" class="player_box">
     <h3 class="first" id="opponent2_username"></h3>
     <span class="slogan" id="opponent2_points"></span><br/>
+    <span id="opponent2_info"></span>
     <span id="opponent2_turn"></span>
 </div>
 
@@ -20,39 +22,45 @@
 </div>
 
 <div id="bank">
-  <img id="bank1" src="/images/cards/S2.gif">
-  <img id="bank2" src="/images/cards/S2.gif">
-  <img id="bank3" src="/images/cards/S2.gif">
+  <img id="bank1"/>
+  <img id="bank2"/>
+  <img id="bank3"/>
 </div>
 
 <div id="your_player" class="player_box">
   <h3 class="first" id="player_username"></h3>
   <span class="slogan" id="player_points"></span><br/>
+  <span id="player_info"></span>
   <span id="player_turn"></span>
 </div>
 
 <div id="cards">
-  <img class="card" id="card1" src="/images/cards/S2.gif">
-  <img class="card" id="card2" src="/images/cards/S2.gif">
-  <img class="card" id="card3" src="/images/cards/S2.gif">
-  <img class="card" id="card4" src="/images/cards/S2.gif">
-  <img class="card" id="card5" src="/images/cards/S2.gif">
-  <img class="card" id="card6" src="/images/cards/S2.gif">
-  <img class="card" id="card7" src="/images/cards/S2.gif">
-  <img class="card" id="card8" src="/images/cards/H2.gif">
-  <img class="card" id="card9" src="/images/cards/H2.gif">
-  <img class="card" id="card10" src="/images/cards/H2.gif">
+  <div id="cards_inner">
+    <img class="card" id="card1"/>
+    <img class="card" id="card2"/>
+    <img class="card" id="card3"/>
+    <img class="card" id="card4"/>
+    <img class="card" id="card5"/>
+    <img class="card" id="card6"/>
+    <img class="card" id="card7"/>
+    <img class="card" id="card8"/>
+    <img class="card" id="card9"/>
+    <img class="card" id="card10"/>
+  </div>
 </div>
 
 <div id="gamemenu">
   <h3 class="first">Game menu</h3>
+  <input id="start" type="submit" value="Start" onclick="start()"/>
+  <input id="open" type="submit" value="Open" onclick="open()"/>
+  <input id="blind" type="submit" value="Blind" onclick="blind()"/>
+  <select id="bettings"></select>
+  <input id="bet" type="submit" value="Bet" onclick="bet()"/>
+  <input id="pass" type="submit" value="Pass" onclick="pass()"/>
+  <input id="leave" type="submit" value="Leave" onclick="leave()"/>
 </div>
 
-<script type="text/javascript" src="/js/ajax.js"/>
-<script type="text/javascript" src="/js/game.js"/>
-<script type="text/javascript">
-  var url = location.href;
-  id = url.substr(url.lastIndexOf('/')+1);
-  update(id);
-</script>
+<script type="text/javascript" src="/js/ajax.js"></script>
+<script type="text/javascript" src="/js/game.js"></script>
+<script type="text/javascript">update();</script>
 {% endblock %}

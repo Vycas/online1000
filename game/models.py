@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from cards import CardSet, ThousandCard
+from cards import ThousandCard
 from random import shuffle
 
 class GameError(Exception):
@@ -57,7 +57,7 @@ class Session(models.Model):
         else:
             raise GameError('This session is already full.')
         
-    def is_full(self):
+    def isFull(self):
         """
         Checks if all three player joined.
         """
@@ -65,6 +65,17 @@ class Session(models.Model):
         return (self.player_2 is not None) and \
                (self.player_2 is not None) and \
                (self.player_3 is not None)
+    
+    def hasActiveGame(self):
+        """
+        Checks if there is a started game.
+        """
+        
+        try:
+            self.game
+            return True
+        except Game.DoesNotExist:
+            return False
 
     def getPlayerByUser(self, user):
         """
@@ -82,18 +93,18 @@ class Session(models.Model):
         """
 
         if current == self.player_1:
-            return player_2
+            return self.player_2
         elif current == self.player_2:
-            return player_3
+            return self.player_3
         elif current == self.player_3:
-            return player_1
+            return self.player_1
 
 
 class Game(models.Model):
     session = models.OneToOneField(Session, null=False)
     turn = models.ForeignKey(Player, null=False)
     bet = models.SmallIntegerField(null=False)
-    bettings = models.BooleanField(null=False)
+    state = models.CharField(max_length=8, null=False)
     blind = models.BooleanField(null=False)
     bank = models.CharField(max_length=16, null=False)
     trump = models.CharField(max_length=1, null=True)
@@ -104,14 +115,18 @@ class Game(models.Model):
         The turn is given to player after dealer.
         """
 
-        if session.game is not None:
+        try:
+            session.game
             raise GameError('This session already has active game.')
+        except Game.DoesNotExist:
+            pass
 
-        if not session.isfull:
+        if not session.isFull():
             raise GameError('Session must be full to start a game.')
 
         self.session = session
-        cards = shuffle(ThousandCard.generateDeck())
+        cards = ThousandCard.generateDeck()
+        shuffle(cards)
         player = session.player_1
         for i in range(3):
             player.cards = cards[i*7:(i+1)*7]
@@ -122,9 +137,10 @@ class Game(models.Model):
         self.bank = cards[21:24]
         self.turn = session.dealer = session.getNextPlayer(session.dealer)
         self.bet = 100
-        self.bettings = True
+        self.state = 'started'
         self.blind = False
         self.trump = None
+        self.save()
 
     def raiseBet(self, player, bet):
         """
@@ -165,6 +181,7 @@ class Game(models.Model):
             - Bets are already finished
             - The turn is not for the given player
             - Player has already passed
+            - Player can not pass if he is the first one
         """
         
         if not self.bettings:
@@ -173,8 +190,11 @@ class Game(models.Model):
             raise GameError('It\'s not your turn to pass.')
         if player.passed:
             raise GameError('This player has already passed.')
+        if self.bet == 100 and self.session.dealer == player:
+            raise GameError('The first player cannot pass the first time.')
 
         player.passed = True
+        self.turn = session.getNextPlayer(player)
 
     def collectBank(self, player):
         """

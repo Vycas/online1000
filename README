@@ -1,0 +1,181 @@
+==============================================================================
+
+                            PROJEKTAS: 1000.online
+
+==============================================================================
+
+1. Þaidimas
+------------------------------------------------------------------------------
+
+1.1 Kas yra 1000?
+    1000 yra kortø þaidimas populiarus rytø Europos ðalyse, þadþiamas 3 arba 4
+þaidëjø. Þaidimo tikslas kuo greièiau surinkti 1000 taðkø. T.y. pirmas þaidë-
+jas surinkæs 1000 laimi.
+
+1.2 Trumpas taisykliø apraðymas.
+    Þaidþiama daug partijø kol kaþkas laimi. Kiekvienai partijai dalinamos
+kortos po 7 kiekvienam þaidëjui ir 3 á bankà. Jei þaidþiama keturiese, tas 3 
+kortas gauna ketvirtas þaidëjas. Taèiau kuriamame projekte bus galima þaisti
+tik tryse, todël 4 þaidëjo nenagrinësime paprastumo labai. Kortø dalintojas
+keièiasi su lig kiekviena partija. Þaidëjas esantis po dalintojo pradeda.
+    Dalyvauja tokios kortos: tûzai, deðimkës, karaliai, damos, valetai,
+devynkës. Reikia pastebëti, kad dæðimkë yra antra pagal striprumà korta.
+    Ið pradþiø vyksta ðaukimai. Kas iððaukia daugiausiai tas nuperka bankà.
+Pirmas þaidëjas privalo ðaukti 100. Kiti privalo kelti arba pasuoti. Keliama
+tik skaièiumi daliu ið 10. Maksimalus ðaukimas - 300. Ðaukia visi þaidëjai
+ratu, kol lieka tik vienas daugiausiai iððaukæs, o kiti lieka pasavæ.
+    Þaidëjai gali ðaukti tamsoje. T.y. nematydami savo kortø. Tuomet jø taðkai
+ðioje partijoje dvigubës (tiek laimëjimo atveju tiek pralaimëjimo). Jei buvo
+Þaidþiama ðviesoje nupirktas bankas parodomas visiems. Jei tamsoje já pasiima
+nupirkæs þaidëjas ir niekam nerodo.
+    Nupirkus bankà reikia atsimesti tris kortas, jø niekam nerodant. Partijos
+pabaigoje atsimesto kortos vistiek bus sumuojamos á surinktus taðkus. Taip pat
+galima dar pakelti ðaukimà arba palikti toká koks buvo perkant bankà. Taèiau
+jo nuleisti negalima.
+    Partijà pradeda bankà nupirkæs þaidëjas. Tada visi þaidëjai meta kortas ið
+eilës. Sumestus tris kortas jas paiima tas - kurio korta didþiausia. T.y. jis
+gauna kirtá ir jis pradeda sekantá ëjimà. Privaloma dëti tos rûðies kortà,
+kuria pradëjo pirmas þaidëjas. Jei tokios neturi - tuomet dedamas koziris, jei
+neturi ir tokio - tuomet gali dëti bet kà.
+    Þaidimo eigoje galima daryti ðaukimus. T.y. paskelbti savo kozirá. Ðaukti
+galima tada jei turima pora - tos paèios rûðies karalius ir dama. Patys ðauki-
+mai automatiðkai duoda taðkus á ðaukianèio þaidëjo sàskaità.
+    > Vynai - 40 taðkø
+    > Kryþiai - 60 taðkø
+    > Bugnai - 80 taðkø
+    > Èirvai - 100 taðkø
+    Kuomet partija baigiama (kai nebelieka kortø), skaièiuojami taðkai. Skai-
+èiuojami padaryti ðaukimai ir surinkti kirèiai. Atitinkamø kortø vertës:
+    > Tûzas - 11 taðkø
+    > 10 - 10 taðkø
+    > Karalius - 4 taðkai
+    > Dama - 3 taðkai
+    > Valetas - 2 taðkai
+    > 9 - 0 taðkø
+    Suskaièiavus taðkus, jei þaidëjas kuris ðaukë privalëjo surinkti tiek kiek
+ðaukë. Jei surinko - ðaukimo suma jam uþsiraðys á pliusà. Jei ne - tiek bus
+atima ið bendros taðkø sumos. Kitiems þaidëjams surinkta taðkø suma apvalinasi
+iki deðimèiø ir raðosi á pliusà.
+    Jei þaidëjas turi 900 taðkø arba daugiau, jam taðkai surinkti per kitø
+þaidëjø þaidimus (kai bankà laimëjo kitas þaidëjas) nesiskaièiuoja. T.y. tur-
+int 900 ir daugiau, þaidimà galima laimëti tik paèiam nuperkant bankà ir sëk-
+mingai suþaidþiant. Jei per tris ëjimus nuo 900 pasiekimos nebus nupirktas ban-
+kas, tam þaidëjui atsiims 120 taðkø.
+    Vienà kartà per þaidimà galima nupirkus bankà atsisakyti þaisti, tuomet 
+sakoma, kad þaidëjas gauna pliusà. Tuomet kiti þaidëjai gauna po 60 taðkø ir
+kortos perdalinamos to paèio dalintojo. Jei bankas buvo nupirktas tamsoje - 
+kiti þaidëjai gauna po 120 taðkø.
+    Jei iðdalinus kortas gaunamos 4 devynkës - kortos permaiðomos to paèio
+dalintojo.
+    Jei iðdalinus kortas gaunamos 3 devynkës - þadþiamos devynkiø þaidimas.
+Devynkes turinti þaidëjas iðsirenka vienà ið jø ir nerodo kitiems. Tada kiti
+iðsirenka bet kokia kortà. Devynkes turintis þaidëjas parodo kokios ruðies
+yra devynkë. Jei kito þaidëjo kortos rûris tokia pat, jis gauna taðkø, o 
+devynkes turintis þaidëjas ne. Jei abu oponentai pasirinko tà patá rûðá ir
+laimëjo, jie taðkus dalinsis. Jei nei vienas þaidëjas neatspejo rûðies, taðkus
+gaus devynkes tûrëjas þaidëjas. Devynkiø taðkø vertës tokios paèios kaip ir
+atitinkamø rûðiø ðaukimai.
+
+1.3 Pilnas taisykliø apraðymas
+    Já galima rasti èia: http://www.pagat.com/marriage/1000.html
+
+
+2. Projektas
+------------------------------------------------------------------------------
+
+2.1 Projektas
+    Projektas kuriamas Python laisvajam dalykui dëstomam VU MIF. Projektas
+raðomas Python programavimo kalba panaudojant Django karkasà. Tai bus
+Web-aplikacija - programa kuri veikia web'e.
+    
+2.2 Projekto apraðymas
+    Þaidimas bus patalpintas kokiam nors serveryje internete ir já bus galima
+pasiekti per tam tikrà URL. Prisijungus svetainëje reikës uþsiregistruoti
+nurodant vardà, email ir slaptaþodá. Numatyta galimybë slaptaþodá atstatyti,
+vartotojas já uþmirðo. Tuomet ávedamas registracijos email ir atsatymo nuoroda
+bus atsiøsta email'u. Prisijungus bus galima pasikeisti slaptaþodá ávedant 
+senajá ir du kartus naujàjá.
+    Prisijungus patenkama á sesijø langà - t.y. langà (lentelæ) kuriame rodomi
+visi pradëti þaidimai. Galima prisijungti tiek prie pradëto þaidimo tiek su-
+kurti naujà.
+    Jei sukuriamas naujas þaidimas, kûrëjas automatiðkai tam ðio þaidimo pirmu
+þaidëju. Jam duodama nuoroda, kuria gali pasidalinti su kitais þaidëjais. Kuo-
+met kitas þaidëjas paspaudþia ant nuorodos, jis tampa ðio þaidimo þaidëju.
+    Þaidimas pradedamas tik tada kai visi trys þaidëjai prisijungia. Tuomet
+einanèiam þaidëjui (dalintojui) atsiranda mygtukas 'start', kuris iðmaiðo ir
+iðdalina kortas. Tuomet visiems þaidëjams atsiranda 2 mygtukai 'open' ir
+'blind', su kuriais pasirenkama ar bus þaidþiama tamsoje ar ðviesoje. Jei
+pasirenkama ðviesoje iðdalintos kortos atverèiamos, prieðingu atveju lieka
+uþverstos. Ðaukimo metu, bet kada prieð nuperkant bankà galima atsiversti
+kortas, jei buvo þaidþiama tamsoje. Tuomet þaidimas tampa ðviesiu. Taèiau kai
+tik kortos paðviesinamos, jos tokios ir lieka. Taigi þaidþiant tamsose buna
+mygtukas 'open'. Tuomet prasideda ðaukimai. Þaidëjai ratu ðaukia arba pasuoja
+. Tam yra du mygtukai 'bet' ir 'pass' bei ðaukiamos sumos pasirinkimas. Pirmam
+þaidëjui pasuoti negalima. Kuomet lieka tik vienas þaidþianti þaidëjas. Ati-
+dengiamas bankas (jei buvo þaidþiama ðviesiai) ir visiems þaidëjams parodomas
+mygtukas 'ok'. T.y. kad jie galëtø pamatyti ir kortas ir leisti þaisti toliau.
+Tuomet kortos patenka pas ðaukiantájá. Jam rodomas ðaukiama suma, kuri yra
+gali bûti tokia pat kaip nupirkto banko arba didesnë ir mygtukas 'begin',
+kuris atsiranda tik tada kai iðsimetamos trys kortos. Kortos iðmetamos ant jø
+paspaudþiant pele. Jei paspaudþiama ant iðmestø kortø jos graþinamos atgal
+(suklydimo atveju). Pradëjus þaidima þaidëjai paeiliui spaudþia ant kortø,
+jas iðmesdami. Kuomet iðmetamos trys kortos, atsiranda mygtukas 'ok', lei-
+dþiantis pradëti sekantá ëjimà. Kuomet padema poros pusë automatiðkai vykdomas
+ðaukimas.
+    Viso þaidimo metu, ekrane rodomi þaidëjø vardai, taðkø kiekis, ir einantis
+þaidëjas. Ðaukimo metus matoma, kiek koks þaidëjas iððaukë ir ar pasavo, bei
+ar ðaukia tamsoje.
+    Ekrano virðuj rodoma svarbi informacija, tokia kaip kas nupirko turgø, kas
+paëmë kirtá ir panasiai.
+    Taip pat numatyta statistikos kaupimo galimybë, kuomet galima paþiûrëti,
+kaip sekasi, t.y. matyti taðkø kitimo lentelæ bei grafikà.
+    Numatyta ir devynkiø þaidimo galimybë, jei liks laiko realizuojant pro-
+jektà.
+    Bet kada þaidimo metu galima pasitraukti, nes visa bûsenos informacija
+saugoma duomenø bazëje. Tuomet kiti þaidëjai tiesiog negalës eiti nes matys
+uþraðà, kad laukiama kito þaidëjo. Kaip þaidëjai sutaria kada þais - tai jau
+ne ðio þaidimo sistemos reikalas. Pasitraukiama ið þaidimo paspaudus mygtukà
+'leave', kuris rodomas visada.
+    Sesijø lentelëje matoma: kas pradëjo þaidimà, þaidimo id, kada þaidimas
+pradëtas, kada buvo paskutinis ëjimas, kieno dabar ëjimas (jei ëjimas yra tavo
+tuo eilutë paryðkinama), bei kokia þaidimo bûsena (nepradëtas, þaidþiamas,
+baigtas - kas laimëjo?). Paspaudus ant eilutës patenkama á þaidimà, toká koks
+jis buvo kaþkada paliktas.
+
+
+3. Ágyvendinimas
+------------------------------------------------------------------------------
+
+3.1 Ágyvendinimo planas
+    Planuojama projektà vystyti tokia tvarka:
+- Sukurti django projektà
+- Sukurti kortø klasæ
+- Sukurti pirminá modelá (sesijas, þaidimus, þaidëjus)
+- Instaliuoti kaþkoká template
+- Sukurti prisijungimo sistemà
+- Sukurti sesijø lentelæ (sesijø startavimas/prisijungimas)
+- Sukurti þaidimo template/view
+- Palaipsniui diegti þaidimo taisykles bei jø testus
+    > Þaidëjø prisijungimas
+    > Kortø dalinimas
+    > Þaidëjus ëjimas ratu
+    > Þaidimo startavimas
+    > Open/Blind pasirinkimas
+    > Banko pirkimas
+    > Kortø atsimetimai
+    > Galutinis ðaukimas
+    > Þaidimo pradëjimas
+    > Kortø mëtymas þaidimo eigoje
+    > Ðaukimai
+    > Taðkø sumavimas / nugalëtojo nustatymas
+    > Perëjimas prie naujo þaidimo
+    > Tikrinimas dël sesijos laimëjimo
+- Paskelbti þaidima public vietoje, kad bûtø galima pradëti testuoti
+- Sukurti papildomas taisykles
+    > Pliuso dëjimas
+    > Riba virð 900
+    > Devynkiø þaidimas
+- Sukurti statistikos rodymà
+
+3.2 Projektavimas
+    ...TODO...

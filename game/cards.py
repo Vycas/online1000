@@ -94,7 +94,7 @@ class Card:
 
     @classmethod
     def generateDeck(cls):
-        return CardSet([cls(kind + value) for value in cls.values.keys() for kind in cls.kinds.keys()])
+        return [cls(kind + value) for value in cls.values.keys() for kind in cls.kinds.keys()]
 
     kinds = {'S': 'Spades', 'C': 'Clubs', 'D': 'Diamonds', 'H': 'Hearts'}
     values = {'A': 'Ace', 'K': 'King', 'Q': 'Queen', 'J': 'Jack',
@@ -119,28 +119,6 @@ class ThousandCard(Card):
     weight = {'A': 11, '10': 10, 'K': 4, 'Q': 3, 'J': 2, '9': 0}
     values = {'A': 'Ace', 'K': 'King', 'Q': 'Queen', 'J': 'Jack', '10': 'Ten', '9': 'Nine'}
     value_order = ('A', '10', 'K', 'Q', 'J', '9')
-
-
-class CardSet(list):
-    """
-    Represent a set of cards.
-    """
-
-    def __init__(self, cards=''):
-        """
-        Initializes the set from a string containing card codes, seperated with spaces.
-        """
-
-        if type(cards) == str:
-            cards = cards.split(' ')    
-        list.__init__(self, cards)
-
-    def __str__(self):
-        """
-        Returns a string containing a list of card codes.
-        """
-
-        return ' '.join(self)
 
 
 if __name__ == "__main__":

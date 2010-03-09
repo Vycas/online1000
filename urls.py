@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     (r'^host/$', host),
     (r'^play/([0-9]+)$', play),
     (r'^update/([0-9]+)$', update),
+    (r'^start/([0-9]+)$', start),
     
     # [Static serve]
     (r'^styles/(?P<path>.*)$', 'django.views.static.serve',
