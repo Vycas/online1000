@@ -155,7 +155,9 @@ def start(request, id):
     try:
         game = Game()
         game.start(session)
+        
     except GameError, error:
+        print error
         return HttpResponse(error, mimetype='text/plain')
     
     

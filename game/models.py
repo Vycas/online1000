@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from cards import ThousandCard
+from fields import ThousandCardField
 from random import shuffle
 
 class GameError(Exception):
@@ -10,9 +11,9 @@ class GameError(Exception):
 class Player(models.Model):
     user = models.ForeignKey(User, null=False)
     points = models.SmallIntegerField(null=False, default=0)
-    cards = models.CharField(max_length=32)
-    bank = models.CharField(max_length=16)
-    tricks = models.CharField(max_length=128)
+    cards = ThousandCardField(10)
+    bank = ThousandCardField(3)
+    tricks = ThousandCardField(24)
     passed = models.BooleanField()
     plus = models.BooleanField(default=False)
 
@@ -106,7 +107,7 @@ class Game(models.Model):
     bet = models.SmallIntegerField(null=False)
     state = models.CharField(max_length=8, null=False)
     blind = models.BooleanField(null=False)
-    bank = models.CharField(max_length=16, null=False)
+    bank = ThousandCardField(3, null=False)
     trump = models.CharField(max_length=1, null=True)
 
     def start(self, session):
@@ -129,10 +130,12 @@ class Game(models.Model):
         shuffle(cards)
         player = session.player_1
         for i in range(3):
+            
             player.cards = cards[i*7:(i+1)*7]
             player.passed = False
             player.bank = None
             player.tricks = None
+            player.save()
             player = session.getNextPlayer(player)
         self.bank = cards[21:24]
         self.turn = session.dealer = session.getNextPlayer(session.dealer)
@@ -141,6 +144,8 @@ class Game(models.Model):
         self.blind = False
         self.trump = None
         self.save()
+        print 'AAAAAA'
+        print session.game
 
     def raiseBet(self, player, bet):
         """

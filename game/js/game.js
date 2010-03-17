@@ -63,12 +63,16 @@ function update() {
                 document.getElementById(controls[i]).style.display = 'none';
               }
               switch (dict.state) {
-                case 'waiting': 
+                case 'waiting':
                   break;
                 case 'ready':
                   if (myturn) {
                     document.getElementById('start').style.display = 'block';
                   }
+                  break;
+                case 'started':
+                  alert('woohoo');
+                  break;
               }
               
               var bettings = document.getElementById('bettings');
