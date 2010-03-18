@@ -57,6 +57,9 @@ class Card:
     def __str__(self):
         return self.code
 
+    def __repr__(self):
+        return repr(self.code)
+
     def __hash__(self):
         return hash(self.code)
 

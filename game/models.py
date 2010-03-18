@@ -14,8 +14,33 @@ class Player(models.Model):
     cards = ThousandCardField(10, null=True)
     bank = ThousandCardField(3, null=True)
     tricks = ThousandCardField(24, null=True)
-    passed = models.BooleanField()
+    blind = models.NullBooleanField(null=True)
+    passed = models.BooleanField(default=False)
     plus = models.BooleanField(default=False)
+    
+    def go_blind(self):
+        """
+        Chooses to play blind.
+        
+        Fails if:
+            - Choise was already open.
+        """
+        
+        if self.blind is False:
+            raise GameError('The choise was already made to be open.')
+        
+        self.blind = True
+        self.save()
+    
+    def go_open(self):
+        """
+        Chooses to play open.
+        
+        Always succeeds. None -> Open OK. Blind -> Open OK.
+        """
+        
+        self.blind = False
+        self.save()
 
 
 class Session(models.Model):
@@ -32,7 +57,7 @@ class Session(models.Model):
         """
         
         player = Player(user=user)
-        #player.save()
+        player.save()
         self.player_1 = player
         self.dealer = player
         self.save()
@@ -110,29 +135,38 @@ class Game(models.Model):
     bank = ThousandCardField(3, null=False)
     trump = models.CharField(max_length=1, null=True)
 
-    def start(self, session):
+    def start(self, session, player):
         """
         New game is started in given session.
+        The game can only be started by dealer.
         The turn is given to player after dealer.
+        
+        Fails if:
+            - The session already has an active game.
+            - Session is not full.
+            - Current user is not a dealer.
         """
 
         try:
             session.game
-            raise GameError('This session already has active game.')
+            raise GameError('This session already has an active game.')
         except Game.DoesNotExist:
             pass
 
         if not session.isFull():
             raise GameError('Session must be full to start a game.')
+        
+        if player != session.dealer:
+            raise GameError('Only the dealer can start the game.')
 
         self.session = session
         cards = ThousandCard.generateDeck()
         shuffle(cards)
         player = session.player_1
         for i in range(3):
-            
-            player.cards = cards[i*7:(i+1)*7]
+            player.cards = sorted(cards[i*7:(i+1)*7])
             player.passed = False
+            player.blind = None
             player.bank = []
             player.tricks = []
             player.save()
@@ -144,8 +178,6 @@ class Game(models.Model):
         self.blind = False
         self.trump = None
         self.save()
-        print 'AAAAAA'
-        print session.game
 
     def raiseBet(self, player, bet):
         """

@@ -58,7 +58,7 @@ function update() {
               document.getElementById('opponent2_points').innerHTML = dict.opponent2_points;
               document.getElementById('opponent2_turn').innerHTML = dict.opponent2_turn;
               controls = ['start', 'open', 'blind', 'bettings', 'bet', 'pass']
-              myturn = document.getElementById('player_turn') != '';
+              myturn = dict.player_turn != '';
               for (var i=0; i<controls.length; i++) {
                 document.getElementById(controls[i]).style.display = 'none';
               }
@@ -71,7 +71,12 @@ function update() {
                   }
                   break;
                 case 'started':
-                  alert('woohoo');
+                  document.getElementById('open').style.display = 'block';
+                  document.getElementById('blind').style.display = 'block';
+                  break;
+                case 'go_blind':
+                  document.getElementById('open').style.display = 'block';
+                case 'go_open':
                   break;
               }
               
@@ -88,13 +93,14 @@ function update() {
                   bettings.appendChild(option);
                 }
               }
+              
               for (var i=1; i<=3; i++) {
-                eval("e=document.getElementById('bank"+i+"'); v=dict.bank"+i+
-                     "; e.src='/images/cards/'+v+'.gif'; e.style.display=v?'inline':'none'");
+                eval("var e=document.getElementById('bank"+i+"'); var v=dict.bank["+(i-1)+"]; "+
+                     "e.src='/images/cards/'+v+'.gif'; e.style.display=v?'inline':'none';");
               }
               for (var i=1; i<=10; i++) {
-                eval("e=document.getElementById('card"+i+"'); v=dict.card"+i+
-                     "; e.src='/images/cards/'+v+'.gif'; e.style.display=v?'inline':'none'");
+                eval("var e=document.getElementById('card"+i+"'); var v=dict.cards["+(i-1)+"]; "+
+                     "e.src='/images/cards/'+v+'.gif'; e.style.display=v?'inline':'none';");
               }
           }
           else {
@@ -111,8 +117,8 @@ function update() {
   }
 }
 
-function start() {
-  var url = '/start/' + getId();
+function post(cmd) {
+  var url = '/' + cmd + '/' + getId();
   sendMessage(url);
   update();
 }
