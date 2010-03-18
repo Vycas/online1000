@@ -148,6 +148,7 @@ jis buvo kaþkada paliktas.
 
 3.1 Ágyvendinimo planas
     Planuojama projektà vystyti tokia tvarka:
+PRADZIA:
 - Sukurti django projektà
 - Sukurti kortø klasæ
 - Sukurti pirminá modelá (sesijas, þaidimus, þaidëjus)
@@ -155,6 +156,7 @@ jis buvo kaþkada paliktas.
 - Sukurti prisijungimo sistemà
 - Sukurti sesijø lentelæ (sesijø startavimas/prisijungimas)
 - Sukurti þaidimo template/view
+2010.03.18:
 - Palaipsniui diegti þaidimo taisykles bei jø testus
     > Þaidëjø prisijungimas
     > Kortø dalinimas
@@ -165,16 +167,20 @@ jis buvo kaþkada paliktas.
     > Kortø atsimetimai
     > Galutinis ðaukimas
     > Þaidimo pradëjimas
+2010.03.25
     > Kortø mëtymas þaidimo eigoje
     > Ðaukimai
     > Taðkø sumavimas / nugalëtojo nustatymas
     > Perëjimas prie naujo þaidimo
     > Tikrinimas dël sesijos laimëjimo
+2010.04.01
 - Paskelbti þaidima public vietoje, kad bûtø galima pradëti testuoti
+2010.04.08
 - Sukurti papildomas taisykles
     > Pliuso dëjimas
     > Riba virð 900
     > Devynkiø þaidimas
+2010.04.15
 - Sukurti statistikos rodymà
 
 3.2 Projektavimas

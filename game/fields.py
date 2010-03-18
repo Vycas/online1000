@@ -33,7 +33,7 @@ class ThousandCardField(models.Field):
         if value is None:
             return None
         
-        value = map(lambda x: x.replace('10', '0'), value)
+        value = map(lambda x: str(x).replace('10', '0'), value)
         return ''.join(value)
     
     def get_db_prep_value(self, value):

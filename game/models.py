@@ -11,9 +11,9 @@ class GameError(Exception):
 class Player(models.Model):
     user = models.ForeignKey(User, null=False)
     points = models.SmallIntegerField(null=False, default=0)
-    cards = ThousandCardField(10)
-    bank = ThousandCardField(3)
-    tricks = ThousandCardField(24)
+    cards = ThousandCardField(10, null=True)
+    bank = ThousandCardField(3, null=True)
+    tricks = ThousandCardField(24, null=True)
     passed = models.BooleanField()
     plus = models.BooleanField(default=False)
 
@@ -32,7 +32,7 @@ class Session(models.Model):
         """
         
         player = Player(user=user)
-        player.save()
+        #player.save()
         self.player_1 = player
         self.dealer = player
         self.save()
@@ -133,8 +133,8 @@ class Game(models.Model):
             
             player.cards = cards[i*7:(i+1)*7]
             player.passed = False
-            player.bank = None
-            player.tricks = None
+            player.bank = []
+            player.tricks = []
             player.save()
             player = session.getNextPlayer(player)
         self.bank = cards[21:24]
