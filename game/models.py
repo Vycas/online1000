@@ -18,7 +18,7 @@ class Player(models.Model):
     passed = models.BooleanField(default=False)
     plus = models.BooleanField(default=False)
     
-    def go_blind(self):
+    def goBlind(self):
         """
         Chooses to play blind.
         
@@ -32,7 +32,7 @@ class Player(models.Model):
         self.blind = True
         self.save()
     
-    def go_open(self):
+    def goOpen(self):
         """
         Chooses to play open.
         
@@ -173,11 +173,12 @@ class Game(models.Model):
             player = session.getNextPlayer(player)
         self.bank = cards[21:24]
         self.turn = session.dealer = session.getNextPlayer(session.dealer)
-        self.bet = 100
-        self.state = 'started'
+        self.bet = 90
+        self.state = 'bettings'
         self.blind = False
         self.trump = None
         self.save()
+        session.save()
 
     def raiseBet(self, player, bet):
         """
@@ -193,7 +194,7 @@ class Game(models.Model):
         First to reach 300 finished bettings.
         """
 
-        if not self.bettings:
+        if self.state != 'bettings':
             raise GameError('Bettings are already finished.')
         if self.turn != player:
             raise GameError('It\'s not your turn to bet.')
@@ -201,14 +202,14 @@ class Game(models.Model):
             raise GameError('Bet must be between 100 and 300.')
         if bet % 10 != 0:
             raise GameError('Bets must be divisible by 10.')
-        if bet < self.bet:
+        if bet <= self.bet:
             raise GameError('Your bet must be higher than current bet.')
         
         self.bet = bet
-        self.turn = session.getNextPlayer(player)
-
+        self.turn = self.session.getNextPlayer(player)
         if bet == 300:
-            self.bettings = False
+            self.state = 'finalBet'
+        self.save()
 
     def makePass(self, player):
         """
@@ -221,17 +222,26 @@ class Game(models.Model):
             - Player can not pass if he is the first one
         """
         
-        if not self.bettings:
+        if self.state != 'bettings':
             raise GameError('Bettings are already finished.')
         if self.turn != player:
             raise GameError('It\'s not your turn to pass.')
         if player.passed:
             raise GameError('This player has already passed.')
-        if self.bet == 100 and self.session.dealer == player:
+        if self.isFirstMove():
             raise GameError('The first player cannot pass the first time.')
 
         player.passed = True
+        player.save()
         self.turn = session.getNextPlayer(player)
+        self.save()
+
+    def isFirstMove(self):
+        """
+        Checks if it is the first move in the game.
+        """
+        
+        return (self.bet == 90) and (self.session.dealer == self.turn)
 
     def collectBank(self, player):
         """

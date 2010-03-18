@@ -57,42 +57,38 @@ function update() {
               document.getElementById('opponent2_username').innerHTML = dict.opponent2_username;
               document.getElementById('opponent2_points').innerHTML = dict.opponent2_points;
               document.getElementById('opponent2_turn').innerHTML = dict.opponent2_turn;
-              controls = ['start', 'open', 'blind', 'bettings', 'bet', 'pass']
-              myturn = dict.player_turn != '';
+              var controls = ['start', 'open', 'blind', 'bettings', 'bet', 'pass']
+              var myturn = dict.player_turn != '';
               for (var i=0; i<controls.length; i++) {
-                document.getElementById(controls[i]).style.display = 'none';
+                hide(controls[i]);
               }
               switch (dict.state) {
                 case 'waiting':
                   break;
                 case 'ready':
                   if (myturn) {
-                    document.getElementById('start').style.display = 'block';
+                    show('start');
                   }
                   break;
-                case 'started':
-                  document.getElementById('open').style.display = 'block';
-                  document.getElementById('blind').style.display = 'block';
+                case 'open_or_blind':
+                  show('open');
+                  show('blind');
                   break;
                 case 'go_blind':
-                  document.getElementById('open').style.display = 'block';
+                  show('open');
                 case 'go_open':
+                if (myturn && !dict.passed) {
+                    show('bettings');
+                    show('bet');
+                    if (!dict.first) {
+                      show('pass');
+                    }
+                    add_bets(dict.bettings)
+                  }
                   break;
               }
               
-              var bettings = document.getElementById('bettings');
-              if (dict.bettings) {
-                bettings.style.display = 'block';
-                for (var i=0; i<bettings.childNodes.length; i++) {
-                  bettings.removeChild(bettings.childNodes[i]);
-                }
-                for (var i=0; i<dict.bettings.length; i++) {
-                  option = document.createElement('option');
-                  option.setAttribute('value', dict.bettings[i])
-                  option.innerHTML = dict.bettings[i];
-                  bettings.appendChild(option);
-                }
-              }
+
               
               for (var i=1; i<=3; i++) {
                 eval("var e=document.getElementById('bank"+i+"'); var v=dict.bank["+(i-1)+"]; "+
@@ -117,7 +113,38 @@ function update() {
   }
 }
 
-function post(cmd) {
+function show(element) {
+  document.getElementById(element).style.display = 'block';
+}
+
+function hide(element) {
+  document.getElementById(element).style.display = 'none';
+}
+
+function add_bets(bets) {
+  if (bets) {
+    var bettings = document.getElementById('bettings');
+    while (bettings.childNodes.length > 0) {
+      bettings.removeChild(bettings.childNodes[0]);
+    }
+    for (var i=0; i<bets.length; i++) {
+      option = document.createElement('option');
+      option.setAttribute('value', bets[i])
+      option.innerHTML = bets[i];
+      bettings.appendChild(option);
+    }
+  }
+}
+
+function bet() {
+  var bettings = document.getElementById('bettings');
+  var bet = bettings.options[bettings.selectedIndex].value;
+  var url = '/bet/' + getId() + '/' + bet;
+  sendMessage(url);
+  update();
+}
+
+function post(cmd, id) {
   var url = '/' + cmd + '/' + getId();
   sendMessage(url);
   update();

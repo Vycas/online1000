@@ -20,8 +20,10 @@ urlpatterns = patterns('',
     (r'^play/([0-9]+)$', play),
     (r'^update/([0-9]+)$', update),
     (r'^start/([0-9]+)$', start),
-    (r'^open/([0-9]+)$', open),
-    (r'^blind/([0-9]+)$', blind),
+    (r'^open/([0-9]+)$', goOpen),
+    (r'^blind/([0-9]+)$', goBlind),
+    (r'^bet/([0-9]+)/([0-9]+)$', raiseBet),
+    (r'^pass/([0-9]+)$', makePass),
     
     # [Static serve]
     (r'^styles/(?P<path>.*)$', 'django.views.static.serve',

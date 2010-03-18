@@ -119,7 +119,8 @@ def getstate(request, id):
         
         if session.isFull():
             if session.hasActiveGame():
-                turn = session.game.turn
+                game = session.game
+                turn = game.turn
                 if player.blind is True:
                     response['state'] = 'go_blind'
                     response['cards'] = ['BACK'] * 7
@@ -127,12 +128,18 @@ def getstate(request, id):
                     response['state'] = 'go_open'
                     response['cards'] = [str(c) for c in player.cards]
                 else:
-                    response['state'] = 'started'
+                    response['state'] = 'open_or_blind'
                     response['cards'] = ['BACK'] * 7
-                if session.game.state == 'started':
+                if game.state == 'bettings':
                     response['bank'] = ['BACK'] * 3
+                    response['passed'] = player.passed
+                    response['first'] = game.isFirstMove()
+                    if not player.passed:
+                        response['bettings'] = []
+                        for bet in range(game.bet + 10, 301, 10):
+                            response['bettings'].append(bet)
                 else:
-                    response['bank'] = [str(c) for c in session.game.bank]
+                    response['bank'] = [str(c) for c in game.bank]
             else:
                 turn = session.dealer
                 response['state'] = 'ready'
@@ -145,9 +152,7 @@ def getstate(request, id):
         else:
             response['info_header'] = 'Waiting for players'
             response['state'] = 'waiting'
-        #response['bettings'] = []
-        #for a in range(140, 301, 10):
-        #    response['bettings'].append(a)
+
         
     except GameError, error:
         return {'error': error}
@@ -181,22 +186,44 @@ def start(request, id):
         return HttpResponse(error, mimetype='text/plain')
     
     
-def open(request, id):
+def goOpen(request, id):
     try:
         session = Session.objects.get(id=id)
     except Session.DoesNotExist:
         return HttpResponse('This session does not exist.', mimetype='text/plain')
 
     player = session.getPlayerByUser(request.user)
-    player.go_open()
+    player.goOpen()
     return ok()
 
-def blind(request, id):
+def goBlind(request, id):
     try:
         session = Session.objects.get(id=id)
     except Session.DoesNotExist:
         return HttpResponse('This session does not exist.', mimetype='text/plain')
 
     player = session.getPlayerByUser(request.user)
-    player.go_blind()
+    player.goBlind()
+    return ok()
+
+def raiseBet(request, id, upto):
+    try:
+        session = Session.objects.get(id=id)
+    except Session.DoesNotExist:
+        return HttpResponse('This session does not exist.', mimetype='text/plain')
+    
+    player = session.getPlayerByUser(request.user)
+    game = session.game
+    game.raiseBet(player, int(upto))
+    return ok()
+
+def makePass(request, id):
+    try:
+        session = Session.objects.get(id=id)
+    except Session.DoesNotExist:
+        return HttpResponse('This session does not exist.', mimetype='text/plain')
+
+    player = session.getPlayerByUser(request.user)
+    game = session.game
+    game.makePass(player)
     return ok()
