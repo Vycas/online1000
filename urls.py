@@ -24,6 +24,9 @@ urlpatterns = patterns('',
     (r'^blind/([0-9]+)$', goBlind),
     (r'^bet/([0-9]+)/([0-9]+)$', raiseBet),
     (r'^pass/([0-9]+)$', makePass),
+    (r'^collect/([0-9]+)$', collectBank),
+    (r'^put/(\d+)/(\w{2,3})$', putCard),
+    (r'^retrieve/(\d+)/(\w{2,3})$', retrieveCard),
     
     # [Static serve]
     (r'^styles/(?P<path>.*)$', 'django.views.static.serve',

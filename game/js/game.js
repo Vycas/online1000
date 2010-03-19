@@ -48,20 +48,21 @@ function update() {
               var response = xmlHttp.responseText;
               eval('var dict = ' + response);
               document.getElementById('info_header').innerHTML = dict.info_header;
-              document.getElementById('player_username').innerHTML = dict.player_username;
-              document.getElementById('player_points').innerHTML = dict.player_points;
-              document.getElementById('player_turn').innerHTML = dict.player_turn;
-              document.getElementById('opponent1_username').innerHTML = dict.opponent1_username;
-              document.getElementById('opponent1_points').innerHTML = dict.opponent1_points;
-              document.getElementById('opponent1_turn').innerHTML = dict.opponent1_turn;
-              document.getElementById('opponent2_username').innerHTML = dict.opponent2_username;
-              document.getElementById('opponent2_points').innerHTML = dict.opponent2_points;
-              document.getElementById('opponent2_turn').innerHTML = dict.opponent2_turn;
-              var controls = ['start', 'open', 'blind', 'bettings', 'bet', 'pass']
-              var myturn = dict.player_turn != '';
-              for (var i=0; i<controls.length; i++) {
+              var controls = ['start', 'open', 'blind', 'bettings', 'bet', 'pass', 'collect'];
+              var players = ['player', 'opponent1', 'opponent2'];
+              var properties = ['username', 'points', 'turn', 'info'];
+              for (var i in players) {
+                for (var j in properties) {
+                  document.getElementById(players[i]+'_'+properties[j]).innerHTML = 
+                    eval('dict.'+players[i]+'_'+properties[j]);
+                }
+              }
+              for (var i in controls) {
                 hide(controls[i]);
               }
+              
+              var myturn = dict.player_turn != '';
+
               switch (dict.state) {
                 case 'waiting':
                   break;
@@ -77,12 +78,24 @@ function update() {
                 case 'go_blind':
                   show('open');
                 case 'go_open':
-                if (myturn && !dict.passed) {
+                  if (myturn && !dict.passed) {
                     show('bettings');
                     show('bet');
                     if (!dict.first) {
                       show('pass');
                     }
+                    add_bets(dict.bettings)
+                  }
+                  break;
+                case 'collect':
+                  if (myturn) {
+                    show('collect');
+                  }
+                  break;
+                case 'finalBet':
+                  if (myturn) {
+                    show('bettings');
+                    show('bet');
                     add_bets(dict.bettings)
                   }
                   break;
@@ -134,6 +147,28 @@ function add_bets(bets) {
       bettings.appendChild(option);
     }
   }
+}
+
+function put(card) {
+  regex = /\/(\w+).gif$/;
+  name = card.src.match(regex)[1];
+  if (name == 'BACK') {
+    return;
+  }
+  var url = '/put/' + getId() + '/' + name;
+  sendMessage(url);
+  update();
+}
+
+function retrieve(card) {
+  regex = /\/(\w+).gif$/;
+  name = card.src.match(regex)[1];
+  if (name == 'BACK') {
+    return;
+  }
+  var url = '/retrieve/' + getId() + '/' + name;
+  sendMessage(url);
+  update();
 }
 
 function bet() {

@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response
 from forms import UserSignUpForm
 from django.template import RequestContext
 from models import Session, Player, Game, GameError
+from cards import ThousandCard
 from django.db.models import Q
 import simplejson as json
 
@@ -96,24 +97,16 @@ def getstate(request, id):
         elif session.player_3 == player:
             opponent1, opponent2 = session.player_1, session.player_2
     
-        response['player_username'] = player.user.username
-        response['player_points'] = str(player.points) + ' points'
-        if opponent1:
-            response['opponent1_username'] = opponent1.user.username
-            response['opponent1_points'] = str(opponent1.points) + ' points'
-        else:
-            response['opponent1_username'] = '[Not connected]'
-            response['opponent1_points'] = ''
-        if opponent2:
-            response['opponent2_username'] = opponent2.user.username
-            response['opponent2_points'] = str(opponent2.points) + ' points'
-        else:
-            response['opponent2_username'] = '[Not connected]'
-            response['opponent2_points'] = ''
-        
-        response['player_turn'] = ''
-        response['opponent1_turn'] = ''
-        response['opponent2_turn'] = ''
+        for p in ('player', 'opponent1', 'opponent2'):
+            pl = eval(p)
+            response[p + '_turn'] = ''
+            response[p + '_info'] = ''
+            if pl:
+                response[p + '_username'] = pl.user.username
+                response[p + '_points'] = str(pl.points) + ' points'
+            else:
+                response[p + '_username'] = '[Not connected]'
+                response[p + '_points'] = ''
         
         response['info_header'] = ''
         
@@ -138,8 +131,45 @@ def getstate(request, id):
                         response['bettings'] = []
                         for bet in range(game.bet + 10, 301, 10):
                             response['bettings'].append(bet)
-                else:
+                    for p in ('player', 'opponent1', 'opponent2'):
+                        pl = eval(p)
+                        if pl.passed:
+                            response[p + '_info'] = 'Pass'
+                        elif pl.bet:
+                            response[p + '_info'] = 'Bet %d' % pl.bet
+                            if (pl.blind):
+                                response[p + '_info'] += ' (Blind)'
+                        else:
+                            response[p + '_info'] = ''
+                elif game.state == 'collect':
+                    winner = game.betsWinner()
+                    response['info_header'] = winner.user.username + ' takes the bank'
+                    response['state'] = 'collect'
+                    response['cards'] = [str(c) for c in player.cards]
+                    if player == winner:
+                        response['bank'] = [str(c) for c in game.bank]
+                    else:
+                        if game.blind:
+                            response['bank'] = ['BACK'] * 3
+                        else:
+                            response['bank'] = [str(c) for c in game.bank]
+                elif game.state == 'finalBet':
+                    response['state'] = 'finalBet'
+                    response['cards'] = [str(c) for c in player.cards]
+                    if turn == player:
+                        response['info_header'] = 'Discard 3 card and make final bet'
+                        response['bank'] = [str(c) for c in game.bank]
+                        response['bettings'] = []
+                        for bet in range(game.bet, 301, 10):
+                            response['bettings'].append(bet)
+                    else:
+                        response['info_header'] = 'Waiting for final bet'
+                        response['bank'] = ['BACK'] * len(game.bank)
+                elif game.state == 'inGame':
+                    response['state'] = 'inGame'
                     response['bank'] = [str(c) for c in game.bank]
+                    response['cards'] = [str(c) for c in player.cards]
+                    
             else:
                 turn = session.dealer
                 response['state'] = 'ready'
@@ -214,7 +244,11 @@ def raiseBet(request, id, upto):
     
     player = session.getPlayerByUser(request.user)
     game = session.game
-    game.raiseBet(player, int(upto))
+    
+    if game.state == 'bettings':
+        game.raiseBet(player, int(upto))
+    elif game.state == 'finalBet':
+        game.begin(player, int(upto))
     return ok()
 
 def makePass(request, id):
@@ -227,3 +261,41 @@ def makePass(request, id):
     game = session.game
     game.makePass(player)
     return ok()
+
+def collectBank(request, id):
+    try:
+        session = Session.objects.get(id=id)
+    except Session.DoesNotExist:
+        return HttpResponse('This session does not exist.', mimetype='text/plain')
+
+    player = session.getPlayerByUser(request.user)
+    game = session.game
+    game.collectBank(player)
+    return ok()
+
+def putCard(request, id, card):
+    try:
+        session = Session.objects.get(id=id)
+    except Session.DoesNotExist:
+        return HttpResponse('This session does not exist.', mimetype='text/plain')
+    
+    player = session.getPlayerByUser(request.user)
+    game = session.game    
+    card = ThousandCard(card)
+    if game.state == 'finalBet':
+        game.discardCard(player, card)
+    else:
+        game.putCard(player, card)
+    return ok()
+
+def retrieveCard(request, id, card):
+    try:
+        session = Session.objects.get(id=id)
+    except Session.DoesNotExist:
+        return HttpResponse('This session does not exist.', mimetype='text/plain')
+
+    player = session.getPlayerByUser(request.user)
+    game = session.game    
+    card = ThousandCard(card)
+    game.retrieveCard(player, card)
+    return ok()        

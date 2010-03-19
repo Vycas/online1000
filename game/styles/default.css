@@ -420,6 +420,11 @@ left: 150px;
 right: 150px;
 }
 
+#bank img, #cards img
+{
+cursor: pointer;
+}
+
 #cards_inner
 {
 padding-left: 40px;
