@@ -99,6 +99,9 @@ function update() {
                     add_bets(dict.bettings)
                   }
                   break;
+                case 'inGame':
+                  document.getElementById('trump').innerHTML = dict.trump;
+                  break;
               }
               
 

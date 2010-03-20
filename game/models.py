@@ -66,7 +66,7 @@ class Player(models.Model):
         """
         
         for card in self.cards:
-            if card.kind == kind:
+            if card.kind() == kind:
                 return True
         return False
         
@@ -163,6 +163,7 @@ class Game(models.Model):
     bank = ThousandCardField(3, null=False)
     memo = ThousandCardField(3, null=False)
     trump = models.CharField(max_length=1, null=True)
+    info = models.CharField(max_length=64, null=True)
 
     def start(self, session, player):
         """
@@ -209,6 +210,7 @@ class Game(models.Model):
         self.state = 'bettings'
         self.blind = False
         self.trump = None
+        self.info = None
         self.save()
         session.save()
 
@@ -347,27 +349,6 @@ class Game(models.Model):
         self.state = 'finalBet'
         self.save()
     
-    def cardCompare(self, other):
-        """
-        Compares to cards with respect to trump.
-        """
-        
-        t1 = self.isTrump
-        t2 = other.isTrump
-        if (t1 == False) and (t2 == True):
-            return -1
-        elif (t1 == True) and (t2 == False):
-            return 1
-        else:
-            v1 = self.value()
-            v2 = other.value()
-            if self.value_order.index(v1) < self.value_order.index(v2):
-                return -1
-            elif self.value_order.index(v1) > self.value_order.index(v2):
-                return 1
-            else:
-                return 0
-    
     def putCard(self, player, card):
         """
         Puts card to the bank.
@@ -388,29 +369,38 @@ class Game(models.Model):
         if not card in player.cards:
             raise GameError('Player does not have given card.')
         
-        first = self.bank[0]
-        if (len(self.bank) > 0) and ((first.kind == card.kind) or (not player.hasKind(first.kind))):
+        if len(self.bank) > 0:
+            first = self.bank[0]
+            if (first.kind() == card.kind()) or (not player.hasKind(first.kind())):
+                player.cards.remove(card)
+                self.bank.append(card)
+            else:
+                raise GameError('You must put the card with matching kind.')
+        else:
             player.cards.remove(card)
             self.bank.append(card)
-        else:
-            raise GameError('You must put the card with matching kind.')
             
         player.bank = [card]
-        if player.hasPair(card):
-            player.call += card.kind
-            self.trump = card.kind
+        if (len(self.bank) == 1) and player.hasPair(card):
+            player.calls += card.kind()
+            self.trump = card.kind()
+            self.info = '%s calls %d (%s)' % (player.user.username, 
+                        ThousandCard.pairs[self.trump], ThousandCard.kinds[self.trump])
         if len(self.bank) == 3:
             self.memo = self.bank
             self.bank[0].player = self.session.getNextPlayer(player)
             self.bank[1].player = self.session.getNextPlayer(self.bank[0].player)
             self.bank[2].player = player
             for c in self.bank:
-                c.isTrump = (c.kind == self.trump)
-                c.__cmp__ = self.cardCompare
+                c.isTrump = (c.kind() == self.trump)
+                c.__cmp__ = lambda x: cardCompare(c, x)
             bestCard = max(self.bank)
-            bestCard.player.cards += self.bank
+            bestCard.player.tricks += self.bank
             bestCard.player.save()
             self.bank = []
+            self.turn = bestCard.player
+            self.info = bestCard.player.user.username + ' takes the trick'
+        else:
             self.turn = self.session.getNextPlayer(player)
         player.save()
         self.save()
@@ -500,3 +490,25 @@ class History(models.Model):
     player_1 = models.SmallIntegerField(null=False)
     player_2 = models.SmallIntegerField(null=False)
     player_3 = models.SmallIntegerField(null=False)
+
+
+def cardCompare(self, other):
+    """
+    Compares to cards with respect to trump.
+    """
+    
+    t1 = self.isTrump
+    t2 = other.isTrump
+    if (t1 == False) and (t2 == True):
+        return -1
+    elif (t1 == True) and (t2 == False):
+        return 1
+    else:
+        v1 = self.value()
+        v2 = other.value()
+        if self.value_order.index(v1) < self.value_order.index(v2):
+            return -1
+        elif self.value_order.index(v1) > self.value_order.index(v2):
+            return 1
+        else:
+            return 0

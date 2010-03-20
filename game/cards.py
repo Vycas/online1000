@@ -57,28 +57,25 @@ class Card:
     def __str__(self):
         return self.code
 
-    def __repr__(self):
-        return repr(self.code)
+    #def __repr__(self):
+    #    return repr(self.code)
 
     def __hash__(self):
         return hash(self.code)
 
     def __cmp__(self, other):
-        k1 = self.kind()
-        k2 = other.kind()
-        if self.kind_order.index(k1) < self.kind_order.index(k2):
-            return -1
-        elif self.kind_order.index(k1) > self.kind_order.index(k2):
-            return 1
+        k1 = self.kind_order.index(self.kind())
+        k2 = self.kind_order.index(other.kind())
+        print 'K1', k1
+        print 'K2', k2
+        if k1 < k2: return -1
+        elif k1 > k2: return 1
         else:
-            v1 = self.value()
-            v2 = other.value()
-            if self.value_order.index(v1) < self.value_order.index(v2):
-                return -1
-            elif self.value_order.index(v1) > self.value_order.index(v2):
-                return 1
-            else:
-                return 0
+            v1 = self.value_order.index(self.value())
+            v2 = self.value_order.index(other.value())
+            if v1 < v2: return -1
+            elif v1 > v2: return 1
+            else: return 0
 
     def kind(self):
         return self.code[0]
@@ -119,6 +116,7 @@ class ThousandCard(Card):
     def points(self):
         return self.weight[self.value()]
 
+    pairs = {'S': 40, 'C': 60, 'D': 80, 'H': 100}
     weight = {'A': 11, '10': 10, 'K': 4, 'Q': 3, 'J': 2, '9': 0}
     values = {'A': 'Ace', 'K': 'King', 'Q': 'Queen', 'J': 'Jack', '10': 'Ten', '9': 'Nine'}
     value_order = ('A', '10', 'K', 'Q', 'J', '9')
