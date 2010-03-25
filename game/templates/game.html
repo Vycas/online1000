@@ -22,9 +22,9 @@
 </div>
 
 <div id="bank">
-  <img id="bank1" onclick="retrieve(this)"/>
   <img id="bank2" onclick="retrieve(this)"/>
   <img id="bank3" onclick="retrieve(this)"/>
+  <img id="bank1" onclick="retrieve(this)"/>
 </div>
 
 <div id="your_player" class="player_box">
@@ -55,6 +55,7 @@
   <input id="start" type="submit" value="Start" onclick="post('start')"/>
   <input id="open" type="submit" value="Open" onclick="post('open')"/>
   <input id="blind" type="submit" value="Blind" onclick="post('blind')"/><br/>
+  <input id="last" type="submit" value="Last trick" onmousedown="showLast()"onmouseup="hideLast()">
   <select id="bettings"></select>
   <input id="bet" type="submit" value="Bet" onclick="bet()"/>
   <input id="pass" type="submit" value="Pass" onclick="post('pass')"/><br/>

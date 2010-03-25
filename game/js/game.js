@@ -6,6 +6,8 @@ function getId() {
   return id;
 }
 
+var dict;
+
 function sendMessage(url) {
   var xmlHttp = createXmlHttpRequestObject();
   
@@ -46,9 +48,9 @@ function update() {
         if (xmlHttp.readyState == 4) {
           if (xmlHttp.status == 200) {
               var response = xmlHttp.responseText;
-              eval('var dict = ' + response);
+              eval('dict = ' + response);
               document.getElementById('info_header').innerHTML = dict.info_header;
-              var controls = ['start', 'open', 'blind', 'bettings', 'bet', 'pass', 'collect'];
+              var controls = ['start', 'open', 'blind', 'bettings', 'bet', 'pass', 'collect', 'last'];
               var players = ['player', 'opponent1', 'opponent2'];
               var properties = ['username', 'points', 'turn', 'info'];
               for (var i in players) {
@@ -100,6 +102,7 @@ function update() {
                   }
                   break;
                 case 'inGame':
+                  show('last')
                   document.getElementById('trump').innerHTML = dict.trump;
                   break;
               }
@@ -161,6 +164,7 @@ function put(card) {
   var url = '/put/' + getId() + '/' + name;
   sendMessage(url);
   update();
+  
 }
 
 function retrieve(card) {
@@ -186,6 +190,32 @@ function post(cmd, id) {
   var url = '/' + cmd + '/' + getId();
   sendMessage(url);
   update();
+}
+
+function keepLastTrick(sec) {
+  if ((dict.state == 'inGame') && (dict.bank.length == 0)) {
+    alert('ok');
+    showLast();
+    window.setTimeout(hideLast, sec);
+  }
+}
+
+function showLast() {
+  if (dict.state == 'inGame') {
+    for (var i=1; i<=3; i++) {
+      eval("var e=document.getElementById('bank"+i+"'); var v=dict.memo["+(i-1)+"]; "+
+           "e.src='/images/cards/'+v+'.gif'; e.style.display=v?'inline':'none';");
+    }
+  }
+}
+
+function hideLast() {
+  if (dict.state == 'inGame') {
+    for (var i=1; i<=3; i++) {
+      eval("var e=document.getElementById('bank"+i+"'); var v=dict.bank["+(i-1)+"]; "+
+           "e.src='/images/cards/'+v+'.gif'; e.style.display=v?'inline':'none';");
+    }
+  }
 }
 
 function leave() {

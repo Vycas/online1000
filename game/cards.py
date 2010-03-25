@@ -66,8 +66,6 @@ class Card:
     def __cmp__(self, other):
         k1 = self.kind_order.index(self.kind())
         k2 = self.kind_order.index(other.kind())
-        print 'K1', k1
-        print 'K2', k2
         if k1 < k2: return -1
         elif k1 > k2: return 1
         else:
@@ -102,7 +100,7 @@ class Card:
               '5': 'Five', '4': 'Four', '3': 'Three', '2': 'Two'}
     
     kind_order = ('S', 'C', 'D', 'H')
-    value_order = ('A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2')
+    value_order = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
 
 
 class ThousandCard(Card):
@@ -119,7 +117,7 @@ class ThousandCard(Card):
     pairs = {'S': 40, 'C': 60, 'D': 80, 'H': 100}
     weight = {'A': 11, '10': 10, 'K': 4, 'Q': 3, 'J': 2, '9': 0}
     values = {'A': 'Ace', 'K': 'King', 'Q': 'Queen', 'J': 'Jack', '10': 'Ten', '9': 'Nine'}
-    value_order = ('A', '10', 'K', 'Q', 'J', '9')
+    value_order = ('9', 'J', 'Q', 'K', '10', 'A')
 
 
 if __name__ == "__main__":

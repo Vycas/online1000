@@ -13,6 +13,7 @@ class Player(models.Model):
     points = models.SmallIntegerField(null=False, default=0)
     cards = ThousandCardField(10, null=True)
     bank = ThousandCardField(3, null=True)
+    thrown = ThousandCardField(7, null=True)
     tricks = ThousandCardField(24, null=True)
     blind = models.NullBooleanField(null=True)
     bet = models.SmallIntegerField(null=True)
@@ -69,7 +70,18 @@ class Player(models.Model):
             if card.kind() == kind:
                 return True
         return False
+    
+    def getGamePoints(self):
+        """
+        Calculates and returns points collected in current game.
+        """
         
+        points = 0
+        for c in self.calls:
+            points += ThousandCard.pairs[c]
+        for c in self.tricks:
+            points += c.points()
+        return points
 
 class Session(models.Model):
     player_1 = models.OneToOneField(Player, null=False, related_name='session_as1')
@@ -161,7 +173,6 @@ class Game(models.Model):
     state = models.CharField(max_length=8, null=False)
     blind = models.BooleanField(null=False)
     bank = ThousandCardField(3, null=False)
-    memo = ThousandCardField(3, null=False)
     trump = models.CharField(max_length=1, null=True)
     info = models.CharField(max_length=64, null=True)
 
@@ -200,6 +211,7 @@ class Game(models.Model):
             player.blind = None
             player.bank = []
             player.memo = []
+            player.thrown = []
             player.tricks = []
             player.calls = ''
             player.save()
@@ -275,6 +287,21 @@ class Game(models.Model):
         
         if self.betsOver():
             self.finishBets()
+
+    def getPlayerOffset(self, player):
+        """
+        Returns given player offset in current game.
+        That is, how far away the player is from the first player.
+        """
+        
+        if (len(self.bank) == 0) or (self.state != 'inGame'):
+            return 0
+        else:
+            card = player.bank[0]
+            nextcard = self.session.getNextPlayer(player).bank[0]
+            if self.bank[0] == card: return 0
+            elif self.bank[0] == nextcard: return 1
+            else: return 2
 
     def isFirstMove(self):
         """
@@ -373,11 +400,13 @@ class Game(models.Model):
             first = self.bank[0]
             if (first.kind() == card.kind()) or (not player.hasKind(first.kind())):
                 player.cards.remove(card)
+                player.thrown.append(card)
                 self.bank.append(card)
             else:
                 raise GameError('You must put the card with matching kind.')
         else:
             player.cards.remove(card)
+            player.thrown.append(card)
             self.bank.append(card)
             
         player.bank = [card]
@@ -387,12 +416,15 @@ class Game(models.Model):
             self.info = '%s calls %d (%s)' % (player.user.username, 
                         ThousandCard.pairs[self.trump], ThousandCard.kinds[self.trump])
         if len(self.bank) == 3:
-            self.memo = self.bank
             self.bank[0].player = self.session.getNextPlayer(player)
             self.bank[1].player = self.session.getNextPlayer(self.bank[0].player)
             self.bank[2].player = player
+            anyTrumps = ([c.kind() for c in self.bank].count(self.trump) > 0)
             for c in self.bank:
-                c.isTrump = (c.kind() == self.trump)
+                if anyTrumps:
+                    c.isTrump = (c.kind() == self.trump)
+                else:
+                    c.isTrump = (c.kind() == self.bank[0].kind())
                 c.__cmp__ = lambda x: cardCompare(c, x)
             bestCard = max(self.bank)
             bestCard.player.tricks += self.bank
@@ -400,6 +432,39 @@ class Game(models.Model):
             self.bank = []
             self.turn = bestCard.player
             self.info = bestCard.player.user.username + ' takes the trick'
+            if len(player.cards) == 0:
+                p1 = self.session.player_1
+                p2 = self.session.player_2
+                p3 = self.session.player_3
+                w = self.betsWinner()
+                for p in (p1, p2, p3):
+                    pts = p.getGamePoints()
+                    print p.user.username, pts
+                    if p == w:
+                        if pts >= self.bet:
+                            pts = self.bet
+                            self.info = "%s succeeds playing %d" % (p.user.username, self.bet)
+                        else:
+                            pts = -self.bet
+                            self.info = "%s fails playing %d" % (p.user.username, self.bet)
+                        if self.blind:
+                            self.info += " (Blind)"
+                            pts *= 2
+                        p.points += pts
+                    else:
+                        if self.blind:
+                            pts *= 2
+                        pts = int(round(pts, -1))
+                        if p.points > 900:
+                            pts = 0
+                        p.points += pts
+                    p.bet = pts
+                    p.save()
+                h = History(session=self.session, player_1=p1.points, player_2=p2.points, player_3=p3.points)
+                h.save()
+                self.delete()
+                self.save()
+                return
         else:
             self.turn = self.session.getNextPlayer(player)
         player.save()

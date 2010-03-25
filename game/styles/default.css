@@ -393,23 +393,23 @@ height: 150px;
 #bank1
 {
 position: absolute;
-top: 0px;
-left: 0px;
+bottom: 0px;
+left: 50px;
+right: 50px;
 }
 
 #bank2
 {
 position: absolute;
 top: 0px;
-right: 0px;
+left: 0px;
 }
 
 #bank3
 {
 position: absolute;
-bottom: 0px;
-left: 50px;
-right: 50px;
+top: 0px;
+right: 0px;
 }
 
 #cards

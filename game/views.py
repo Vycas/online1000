@@ -119,7 +119,7 @@ def getstate(request, id):
                     response['cards'] = ['BACK'] * 7
                 elif player.blind is False:
                     response['state'] = 'go_open'
-                    response['cards'] = sorted([str(c) for c in player.cards])
+                    response['cards'] = [str(c) for c in sorted(player.cards)]
                 else:
                     response['state'] = 'open_or_blind'
                     response['cards'] = ['BACK'] * 7
@@ -145,7 +145,7 @@ def getstate(request, id):
                     winner = game.betsWinner()
                     response['info_header'] = winner.user.username + ' takes the bank'
                     response['state'] = 'collect'
-                    response['cards'] = sorted([str(c) for c in player.cards])
+                    response['cards'] = [str(c) for c in sorted(player.cards)]
                     if player == winner:
                         response['bank'] = [str(c) for c in game.bank]
                     else:
@@ -155,7 +155,7 @@ def getstate(request, id):
                             response['bank'] = [str(c) for c in game.bank]
                 elif game.state == 'finalBet':
                     response['state'] = 'finalBet'
-                    response['cards'] = sorted([str(c) for c in player.cards])
+                    response['cards'] = [str(c) for c in sorted(player.cards)]
                     if turn == player:
                         response['info_header'] = 'Discard 3 card and make final bet'
                         response['bank'] = [str(c) for c in game.bank]
@@ -167,15 +167,27 @@ def getstate(request, id):
                         response['bank'] = ['BACK'] * len(game.bank)
                 elif game.state == 'inGame':
                     response['state'] = 'inGame'
-                    if len(game.bank) == 0:
-                        response['bank'] = [str(c) for c in game.memo]
-                    else:
-                        response['bank'] = [str(c) for c in game.bank]
-                    response['cards'] = sorted([str(c) for c in player.cards])
+                    next = session.getNextPlayer(player)
+                    nextnext = session.getNextPlayer(next)
+                    offset = max(len(player.thrown), len(next.thrown), len(nextnext.thrown))
+                    response['bank'] = []
+                    response['memo'] = []
+                    for p in (player, next, nextnext):
+                        if offset > 0 and len(p.thrown) == offset:
+                            response['bank'].append(str(p.thrown[offset-1]))
+                        else:
+                            response['bank'].append(None)
+                        if offset > 1 and len(p.thrown) >= offset-1:
+                            response['memo'].append(str(p.thrown[offset-2]))
+                        else:
+                            response['memo'].append(None)
+                    response['cards'] = [str(c) for c in sorted(player.cards)]
                     if game.trump:
                         response['trump'] = 'Trump: ' + ThousandCard.kinds[game.trump]
                     else:
                         response['trump'] = ''
+                    if game.info:
+                        response['info_header'] = game.info
             else:
                 turn = session.dealer
                 response['state'] = 'ready'
