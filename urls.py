@@ -2,29 +2,23 @@ from django.conf.urls.defaults import *
 from django.contrib.auth.views import *
 from game.views import *
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
-
 urlpatterns = patterns('',
     (r'', include('django.contrib.auth.urls')),
     
     (r'^$', welcome),
     (r'^welcome$', welcome),
-    
-    #(r'^login$', login),
     (r'^signup$', signup),
     (r'^signup_done$', signup_done),
     (r'^sessions$', sessions),
     (r'^host/$', host),
-    (r'^play/([0-9]+)$', play),
-    (r'^update/([0-9]+)$', update),
-    (r'^start/([0-9]+)$', start),
-    (r'^open/([0-9]+)$', goOpen),
-    (r'^blind/([0-9]+)$', goBlind),
-    (r'^bet/([0-9]+)/([0-9]+)$', raiseBet),
-    (r'^pass/([0-9]+)$', makePass),
-    (r'^collect/([0-9]+)$', collectBank),
+    (r'^play/(\d+)$', play),
+    (r'^update/(\d+)$', update),
+    (r'^start/(\d+)$', start),
+    (r'^open/(\d+)$', goOpen),
+    (r'^blind/(\d+)$', goBlind),
+    (r'^bet/(\d+)/(\d+)$', raiseBet),
+    (r'^pass/(\d+)$', makePass),
+    (r'^collect/(\d+)$', collectBank),
     (r'^put/(\d+)/(\w{2,3})$', putCard),
     (r'^retrieve/(\d+)/(\w{2,3})$', retrieveCard),
     
@@ -35,15 +29,4 @@ urlpatterns = patterns('',
         {'document_root': 'game/images'}),
     (r'^js/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': 'game/js'}),
-
-
-    # Example:
-    # (r'^online1000/', include('online1000.foo.urls')),
-
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
-    # to INSTALLED_APPS to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # (r'^admin/', include(admin.site.urls)),
 )

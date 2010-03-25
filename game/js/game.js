@@ -132,6 +132,11 @@ function update() {
   }
 }
 
+function updater() {
+  update();
+  window.setTimeout(updater, 2000);
+}
+
 function show(element) {
   document.getElementById(element).style.display = 'block';
 }
@@ -196,7 +201,7 @@ function keepLastTrick(sec) {
   if ((dict.state == 'inGame') && (dict.bank.length == 0)) {
     alert('ok');
     showLast();
-    window.setTimeout(hideLast, sec);
+    window.setTimeout(hideLast, sec*1000);
   }
 }
 

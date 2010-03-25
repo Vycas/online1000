@@ -89,7 +89,15 @@ class Session(models.Model):
     player_3 = models.OneToOneField(Player, null=True, related_name='session_as3')
     dealer = models.OneToOneField(Player, null=False, related_name='session_as_dealer')
     started = models.DateTimeField(auto_now_add=True, null=False)
+    modified = models.DateTimeField(auto_now=True, null=False)
     finished = models.DateTimeField(null=True)
+    turn = models.ForeignKey(Player, null=True)
+    bet = models.SmallIntegerField(null=True)
+    state = models.CharField(max_length=8, null=False)
+    blind = models.BooleanField(default=False)
+    bank = ThousandCardField(3, null=True)
+    trump = models.CharField(max_length=1, null=True)
+    info = models.CharField(max_length=64, null=True)
 
     def host(self, user):
         """
@@ -100,6 +108,7 @@ class Session(models.Model):
         player.save()
         self.player_1 = player
         self.dealer = player
+        self.state = 'waiting'
         self.save()
         return player
 
@@ -118,6 +127,7 @@ class Session(models.Model):
             player = Player(user=user)
             player.save()
             self.player_3 = player
+            self.state = 'ready'
             self.save()
             return player
         else:
@@ -131,17 +141,6 @@ class Session(models.Model):
         return (self.player_2 is not None) and \
                (self.player_2 is not None) and \
                (self.player_3 is not None)
-    
-    def hasActiveGame(self):
-        """
-        Checks if there is a started game.
-        """
-        
-        try:
-            self.game
-            return True
-        except Game.DoesNotExist:
-            return False
 
     def getPlayerByUser(self, user):
         """
@@ -165,66 +164,43 @@ class Session(models.Model):
         elif current == self.player_3:
             return self.player_1
 
-
-class Game(models.Model):
-    session = models.OneToOneField(Session, null=False)
-    turn = models.ForeignKey(Player, null=False)
-    bet = models.SmallIntegerField(null=False)
-    state = models.CharField(max_length=8, null=False)
-    blind = models.BooleanField(null=False)
-    bank = ThousandCardField(3, null=False)
-    trump = models.CharField(max_length=1, null=True)
-    info = models.CharField(max_length=64, null=True)
-
-    def start(self, session, player):
+    def start(self, player):
         """
         New game is started in given session.
         The game can only be started by dealer.
         The turn is given to player after dealer.
-        
+
         Fails if:
-            - The session already has an active game.
+            - Current game have not been finished.
             - Session is not full.
             - Current user is not a dealer.
         """
 
-        try:
-            session.game
-            raise GameError('This session already has an active game.')
-        except Game.DoesNotExist:
-            pass
-
-        if not session.isFull():
-            raise GameError('Session must be full to start a game.')
-        
-        if player != session.dealer:
+        if self.state != 'ready':
+            raise GameError('Current game have not been finished or session is not full.')
+        if player != self.dealer:
             raise GameError('Only the dealer can start the game.')
 
-        self.session = session
         cards = ThousandCard.generateDeck()
         shuffle(cards)
-        player = session.player_1
-        for i in range(3):
+        for i, player in enumerate([self.player_1, self.player_2, self.player_3]):
             player.cards = cards[i*7:(i+1)*7]
             player.passed = False
             player.bet = None
             player.blind = None
             player.bank = []
-            player.memo = []
             player.thrown = []
             player.tricks = []
             player.calls = ''
             player.save()
-            player = session.getNextPlayer(player)
         self.bank = cards[21:24]
-        self.turn = session.dealer = session.getNextPlayer(session.dealer)
+        self.turn = self.dealer = self.getNextPlayer(self.dealer)
         self.bet = 90
         self.state = 'bettings'
         self.blind = False
         self.trump = None
         self.info = None
         self.save()
-        session.save()
 
     def raiseBet(self, player, bet):
         """
@@ -250,13 +226,13 @@ class Game(models.Model):
             raise GameError('Bets must be divisible by 10.')
         if bet <= self.bet:
             raise GameError('Your bet must be higher than current bet.')
-        
+
         player.bet = bet
         player.save()
         self.bet = bet
-        self.turn = self.session.getNextPlayer(player)
+        self.turn = self.getNextPlayer(player)
         self.save()
-        
+
         if self.betsOver():
             self.finishBets()
 
@@ -270,7 +246,7 @@ class Game(models.Model):
             - Player has already passed
             - Player can not pass if he is the first one
         """
-        
+
         if self.state != 'bettings':
             raise GameError('Bettings are already finished.')
         if self.turn != player:
@@ -282,9 +258,9 @@ class Game(models.Model):
 
         player.passed = True
         player.save()
-        self.turn = self.session.getNextPlayer(player)
+        self.turn = self.getNextPlayer(player)
         self.save()
-        
+
         if self.betsOver():
             self.finishBets()
 
@@ -293,12 +269,12 @@ class Game(models.Model):
         Returns given player offset in current game.
         That is, how far away the player is from the first player.
         """
-        
+
         if (len(self.bank) == 0) or (self.state != 'inGame'):
             return 0
         else:
             card = player.bank[0]
-            nextcard = self.session.getNextPlayer(player).bank[0]
+            nextcard = self.getNextPlayer(player).bank[0]
             if self.bank[0] == card: return 0
             elif self.bank[0] == nextcard: return 1
             else: return 2
@@ -307,55 +283,55 @@ class Game(models.Model):
         """
         Checks if it is the first move in the game.
         """
-        
-        return (self.bet == 90) and (self.session.dealer == self.turn)
+
+        return (self.bet == 90) and (self.dealer == self.turn)
 
     def betsOver(self):
         """
         Checks if bettings are over.
-        
+
         Bet are over when:
             - Two of the three player passes
             - 300 points bet is reached
         """
-        
+
         passed = 0
-        if self.session.player_1.passed: passed += 1
-        if self.session.player_2.passed: passed += 1
-        if self.session.player_3.passed: passed += 1
-        
+        if self.player_1.passed: passed += 1
+        if self.player_2.passed: passed += 1
+        if self.player_3.passed: passed += 1
+
         if passed == 2:
             return True
         if self.bet == 300:
             return True
         return False
-    
+
     def betsWinner(self):
         """"
         Returns bets winner (last betting player) which can collect the bank.
         """
-        
-        if self.session.player_1.bet == '300': return self.session.player_1
-        if self.session.player_2.bet == '300': return self.session.player_2
-        if self.session.player_3.bet == '300': return self.session.player_3
-        
-        if not self.session.player_1.passed: return self.session.player_1
-        elif not self.session.player_2.passed: return self.session.player_2
-        elif not self.session.player_3.passed: return self.session.player_3
+
+        if self.player_1.bet == '300': return self.player_1
+        if self.player_2.bet == '300': return self.player_2
+        if self.player_3.bet == '300': return self.player_3
+
+        if not self.player_1.passed: return self.player_1
+        elif not self.player_2.passed: return self.player_2
+        elif not self.player_3.passed: return self.player_3
         else: raise GameError('Unexpected error: all players passed')
-    
+
     def finishBets(self):
         """
         After bets are over, set game variables and goes to bank collect state.
         """
-        
+
         player = self.betsWinner()
         self.bet = player.bet
         self.blind = player.blind
         self.state = 'collect'
         self.turn = player
         self.save()
-
+        
     def collectBank(self, player):
         """
         Collect the bank.
@@ -375,112 +351,18 @@ class Game(models.Model):
         self.bank = []
         self.state = 'finalBet'
         self.save()
-    
-    def putCard(self, player, card):
-        """
-        Puts card to the bank.
-        
-        Fails if:
-            - The turn is not for the given player.
-            - There is already 3 cards in bank.
-            - Player does not have given card.
-            - Game state is not for putting cards.
-        """
-        
-        if self.state != 'inGame':
-            raise GameError('You can not put cards in this game state.')
-        if self.turn != player:
-            raise GameError('It\'s not your turn to go.')
-        if len(self.bank) == 3:
-            raise GameError('There is already 3 cards in bank.')
-        if not card in player.cards:
-            raise GameError('Player does not have given card.')
-        
-        if len(self.bank) > 0:
-            first = self.bank[0]
-            if (first.kind() == card.kind()) or (not player.hasKind(first.kind())):
-                player.cards.remove(card)
-                player.thrown.append(card)
-                self.bank.append(card)
-            else:
-                raise GameError('You must put the card with matching kind.')
-        else:
-            player.cards.remove(card)
-            player.thrown.append(card)
-            self.bank.append(card)
-            
-        player.bank = [card]
-        if (len(self.bank) == 1) and player.hasPair(card):
-            player.calls += card.kind()
-            self.trump = card.kind()
-            self.info = '%s calls %d (%s)' % (player.user.username, 
-                        ThousandCard.pairs[self.trump], ThousandCard.kinds[self.trump])
-        if len(self.bank) == 3:
-            self.bank[0].player = self.session.getNextPlayer(player)
-            self.bank[1].player = self.session.getNextPlayer(self.bank[0].player)
-            self.bank[2].player = player
-            anyTrumps = ([c.kind() for c in self.bank].count(self.trump) > 0)
-            for c in self.bank:
-                if anyTrumps:
-                    c.isTrump = (c.kind() == self.trump)
-                else:
-                    c.isTrump = (c.kind() == self.bank[0].kind())
-                c.__cmp__ = lambda x: cardCompare(c, x)
-            bestCard = max(self.bank)
-            bestCard.player.tricks += self.bank
-            bestCard.player.save()
-            self.bank = []
-            self.turn = bestCard.player
-            self.info = bestCard.player.user.username + ' takes the trick'
-            if len(player.cards) == 0:
-                p1 = self.session.player_1
-                p2 = self.session.player_2
-                p3 = self.session.player_3
-                w = self.betsWinner()
-                for p in (p1, p2, p3):
-                    pts = p.getGamePoints()
-                    print p.user.username, pts
-                    if p == w:
-                        if pts >= self.bet:
-                            pts = self.bet
-                            self.info = "%s succeeds playing %d" % (p.user.username, self.bet)
-                        else:
-                            pts = -self.bet
-                            self.info = "%s fails playing %d" % (p.user.username, self.bet)
-                        if self.blind:
-                            self.info += " (Blind)"
-                            pts *= 2
-                        p.points += pts
-                    else:
-                        if self.blind:
-                            pts *= 2
-                        pts = int(round(pts, -1))
-                        if p.points > 900:
-                            pts = 0
-                        p.points += pts
-                    p.bet = pts
-                    p.save()
-                h = History(session=self.session, player_1=p1.points, player_2=p2.points, player_3=p3.points)
-                h.save()
-                self.delete()
-                self.save()
-                return
-        else:
-            self.turn = self.session.getNextPlayer(player)
-        player.save()
-        self.save()
-    
+
     def discardCard(self, player, card):
         """
         Discards card to the bank.
-        
+
         Fails if:
             - The turn is not for the given player.
             - There is already 3 cards in bank.
             - Player does not have given card.
             - Game state is not for discarding cards.
         """
-        
+
         if self.state != 'finalBet':
             raise GameError('You can not put cards in this game state.')
         if self.turn != player:
@@ -489,29 +371,29 @@ class Game(models.Model):
             raise GameError('There is already 3 cards in bank.')
         if not card in player.cards:
             raise GameError('Player does not have given card.')
-        
+
         player.cards.remove(card)
         self.bank.append(card)
         player.save()
         self.save()
-    
+
     def retrieveCard(self, player, card):
         """
         Retrieves card from the bank in final bet state (in case of mistake).
-        
+
         Fails if:
             - Game state is not final bet.
             - The turn is not for the given player.
             - Bank does not contain given card.
         """
-        
+
         if self.state != 'finalBet':
             raise GameError('Retrieving cards is possible only in final bet state.')
         if self.turn != player:
             raise GameError('It\'s not your turn to go.')
         if not card in self.bank:
             raise GameError('Bank does not contain given card.')
-        
+
         self.bank.remove(card)
         self.save()
         player.cards.append(card)
@@ -520,7 +402,7 @@ class Game(models.Model):
     def begin(self, player, finalBet):
         """
         Called after bank collection and final bet. Start the main game.
-        
+
         Fails if:
             - The turn is not for the given player.
             - Game state is not final bet.
@@ -549,6 +431,99 @@ class Game(models.Model):
         self.bank = []
         player.save()
         self.save()
+    
+    def putCard(self, player, card):
+        """
+        Puts card to the bank.
+
+        Fails if:
+            - The turn is not for the given player.
+            - There is already 3 cards in bank.
+            - Player does not have given card.
+            - Game state is not for putting cards.
+        """
+
+        if self.state != 'inGame':
+            raise GameError('You can not put cards in this game state.')
+        if self.turn != player:
+            raise GameError('It\'s not your turn to go.')
+        if len(self.bank) == 3:
+            raise GameError('There is already 3 cards in bank.')
+        if not card in player.cards:
+            raise GameError('Player does not have given card.')
+
+        if len(self.bank) > 0:
+            first = self.bank[0]
+            if (first.kind() == card.kind()) or (not player.hasKind(first.kind())):
+                player.cards.remove(card)
+                player.thrown.append(card)
+                self.bank.append(card)
+            else:
+                raise GameError('You must put the card with matching kind.')
+        else:
+            player.cards.remove(card)
+            player.thrown.append(card)
+            self.bank.append(card)
+
+        player.bank = [card]
+        self.info = ''
+        if (len(self.bank) == 1) and player.hasPair(card):
+            player.calls += card.kind()
+            self.trump = card.kind()
+            self.info = '%s calls %d (%s)' % (player.user.username, 
+                        ThousandCard.pairs[self.trump], ThousandCard.kinds[self.trump])
+        if len(self.bank) == 3:
+            self.bank[0].player = self.getNextPlayer(player)
+            self.bank[1].player = self.getNextPlayer(self.bank[0].player)
+            self.bank[2].player = player
+            anyTrumps = ([c.kind() for c in self.bank].count(self.trump) > 0)
+            for c in self.bank:
+                if anyTrumps:
+                    c.isTrump = (c.kind() == self.trump)
+                else:
+                    c.isTrump = (c.kind() == self.bank[0].kind())
+                c.__cmp__ = lambda x: cardCompare(c, x)
+            bestCard = max(self.bank)
+            bestCard.player.tricks += self.bank
+            bestCard.player.save()
+            self.bank = []
+            self.turn = bestCard.player
+            self.info = bestCard.player.user.username + ' takes the trick'
+            if len(player.cards) == 0:
+                w = self.betsWinner()
+                for p in (self.player_1, self.player_2, self.player_3):
+                    pts = p.getGamePoints()
+                    print p.user.username, pts
+                    if p == w:
+                        if pts >= self.bet:
+                            pts = self.bet
+                            self.info = "%s succeeds playing %d" % (p.user.username, self.bet)
+                        else:
+                            pts = -self.bet
+                            self.info = "%s fails playing %d" % (p.user.username, self.bet)
+                        if self.blind:
+                            self.info += " (Blind)"
+                            pts *= 2
+                        p.points += pts
+                    else:
+                        if self.blind:
+                            pts *= 2
+                        pts = int(round(pts, -1))
+                        if p.points > 900:
+                            pts = 0
+                        p.points += pts
+                    p.bet = pts
+                    p.save()
+                h = History(session=self, player_1=p1.points, player_2=p2.points, player_3=p3.points)
+                h.save()
+                self.state = 'ready'
+                self.save()
+                return
+        else:
+            self.turn = self.getNextPlayer(player)
+        player.save()
+        self.save()
+
 
 class History(models.Model):
     session = models.ForeignKey(Session, null=False)

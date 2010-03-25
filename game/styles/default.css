@@ -337,6 +337,12 @@ height: 100px;
 text-transform: none;
 }
 
+.player_box span
+{
+display: block;
+margin-bottom: 2px;
+}
+
 #left_opponent
 {
 position: absolute;
